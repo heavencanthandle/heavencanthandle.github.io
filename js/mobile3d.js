@@ -31,12 +31,24 @@ const lightBulbMaterial = new THREE.MeshPhongMaterial({
     emissiveIntensity: 0.5
 });
 
+// Add deck materials
+const deckMaterial = new THREE.MeshPhongMaterial({ color: 0x8b4513 }); // Wood brown
+const railingMaterial = new THREE.MeshPhongMaterial({ color: 0x4a3c2b }); // Dark brown
+
 // Room dimensions (based on door size)
 const doorWidth = 0.5;
 const doorHeight = 1;
 const roomSize = doorWidth * 9;
 const wallHeight = doorHeight * 2;
 const wallThickness = 0.1;
+
+// Adjust deck dimensions
+const deckWidth = roomSize * 0.4; // Make deck narrower for side of house
+const deckDepth = roomSize * 0.8; // Make deck deeper
+const deckHeight = wallHeight * 0.6;
+const railingHeight = 0.5;
+const postThickness = 0.1;
+const railingThickness = 0.02; // Much thinner railings
 
 // Create walls
 const walls = [];
@@ -60,7 +72,7 @@ wallPositions.forEach(pos => {
 
 // Create door (on front wall)
 const door = new THREE.Mesh(
-    new THREE.BoxGeometry(doorWidth, doorHeight, wallThickness),
+    new THREE.BoxGeometry(doorWidth, doorHeight, wallThickness+0.01),
     doorMaterial
 );
 door.position.set(0, doorHeight/2, roomSize/2);
@@ -115,8 +127,8 @@ const createSconce = (x, z, rotationY) => {
 // Add sconces to walls
 createSconce(-roomSize/3, -roomSize/2 + wallThickness, 0);
 createSconce(roomSize/3, -roomSize/2 + wallThickness, 0);
-createSconce(-roomSize/2 + wallThickness, 0, Math.PI/2);
-createSconce(roomSize/2 - wallThickness, 0, -Math.PI/2);
+createSconce(-roomSize/2 + wallThickness, 0, -Math.PI/2);
+createSconce(roomSize/2 - wallThickness, 0, Math.PI/2);
 
 // Add floor
 const floor = new THREE.Mesh(
@@ -125,6 +137,191 @@ const floor = new THREE.Mesh(
 );
 floor.rotation.x = -Math.PI/2;
 scene.add(floor);
+
+// Create deck platform - now on right side
+const deckPlatform = new THREE.Mesh(
+    new THREE.BoxGeometry(deckWidth, postThickness, deckDepth),
+    deckMaterial
+);
+deckPlatform.position.set(roomSize/2 + deckWidth/2, deckHeight, 0);
+scene.add(deckPlatform);
+
+// Create support posts
+const createSupportPost = (x, z) => {
+    const post = new THREE.Mesh(
+        new THREE.BoxGeometry(postThickness, deckHeight, postThickness),
+        deckMaterial
+    );
+    post.position.set(x, deckHeight/2, z);
+    scene.add(post);
+};
+
+// Add corner support posts for right side deck
+createSupportPost(roomSize/2 + deckWidth-(postThickness/2), deckDepth/2-(postThickness/2));
+createSupportPost(roomSize/2 + deckWidth-(postThickness/2), -deckDepth/2+(postThickness/2));
+
+
+// Add middle support posts
+createSupportPost(roomSize/2 + deckWidth/2, deckDepth/2-(postThickness/2));
+createSupportPost(roomSize/2 + deckWidth/2, -deckDepth/2+(postThickness/2));
+createSupportPost(roomSize/2 + deckWidth-(postThickness/2), 0);
+createSupportPost(roomSize/2+ deckWidth/2, 0);
+
+// Modified stairs position and orientation
+const stairCount = 6;
+const stairWidth = deckWidth/3.3;
+const stairDepth = 0.2;
+const stairHeight = deckHeight/stairCount;
+const stairStartX = roomSize/2 -0.1+ deckWidth/4; // Position stairs to the right front
+const stairStartZ = (roomSize/2)+0.75; // Start at front of house
+
+// Create stairs going from front to deck
+for(let i = 0; i < stairCount; i++) {
+    const stair = new THREE.Mesh(
+        new THREE.BoxGeometry(stairWidth, stairHeight/2, stairDepth),
+        deckMaterial
+    );
+    stair.position.set(
+        stairStartX,
+        (i + 0.5) * stairHeight,
+        stairStartZ - (i + 0.5) * stairDepth
+    );
+    scene.add(stair);
+}
+
+// Modified railing function with adjustable start point for rails
+const createRailing = (width, depth, position, skipSection = null, railingStartOffset = 0) => {
+    // Calculate actual rail width/depth accounting for offset
+    const actualWidth = width - railingStartOffset;
+    const actualDepth = depth;
+
+    // Top rail
+    const topRail = new THREE.Mesh(
+        new THREE.BoxGeometry(actualWidth, railingThickness, actualDepth),
+        railingMaterial
+    );
+    // Adjust position to account for offset
+    topRail.position.copy(position);
+    if (width > depth) { // Side railings
+        topRail.position.x += railingStartOffset/2;
+    }
+    topRail.position.y += railingHeight;
+    scene.add(topRail);
+
+    // Bottom rail
+    const bottomRail = new THREE.Mesh(
+        new THREE.BoxGeometry(actualWidth, railingThickness, actualDepth),
+        railingMaterial
+    );
+    // Adjust position to account for offset
+    bottomRail.position.copy(position);
+    if (width > depth) { // Side railings
+        bottomRail.position.x += railingStartOffset/2;
+    }
+    bottomRail.position.y += railingHeight/2;
+    scene.add(bottomRail);
+
+    // Vertical posts
+    const postSpacing = 0.3;
+    const length = Math.max(width, depth);
+    const count = Math.floor(length/postSpacing);
+    
+    for(let i = 0; i <= count; i++) {
+        // Calculate position for this post
+        const pos = i * postSpacing / length;
+        
+        // Skip posts in the specified section and before the start offset
+        if (skipSection && pos >= skipSection.start && pos <= skipSection.end) continue;
+        if (pos * length < railingStartOffset) continue;
+
+        const verticalPost = new THREE.Mesh(
+            new THREE.BoxGeometry(railingThickness, railingHeight, railingThickness),
+            railingMaterial
+        );
+        
+        if(width > depth) { // Side railings
+            verticalPost.position.set(
+                position.x - width/2 + i * postSpacing,
+                position.y + railingHeight/2,
+                position.z
+            );
+        } else { // Front/back railing
+            verticalPost.position.set(
+                position.x,
+                position.y + railingHeight/2,
+                position.z - depth/2 + i * postSpacing
+            );
+        }
+        scene.add(verticalPost);
+    }
+};
+
+// Add deck railings
+// Front railing
+createRailing(
+    railingThickness, 
+    deckDepth, 
+    new THREE.Vector3(roomSize/2 + deckWidth, deckHeight, 0)
+);
+
+// Back railing
+createRailing(
+    deckWidth, 
+    railingThickness, 
+    new THREE.Vector3(roomSize/2 + deckWidth/2, deckHeight, -deckDepth/2)
+);
+
+// Side railing with gap for stairs and adjusted start point
+const postSpacing = 0.3;
+const railingStartOffset = stairWidth/2 + postSpacing; // Added one post spaces before sta
+createRailing(
+    deckWidth, 
+    railingThickness, 
+    new THREE.Vector3(roomSize/2 + deckWidth/2, deckHeight, deckDepth/2),
+    { start: 0, end: 0.3 }, // Gap where stairs meet
+    railingStartOffset // Offset where railing starts
+);
+
+// Add stair railings
+const createStairRailing = (isLeft) => {
+    const offset = isLeft ? -stairWidth/2 : stairWidth/2;
+    
+    // Angled top rail
+    const railLength = Math.sqrt(Math.pow(stairCount * stairDepth, 2) + Math.pow(deckHeight, 2));
+    const angle = Math.atan2(deckHeight, stairCount * stairDepth);
+    
+    const topRail = new THREE.Mesh(
+        new THREE.BoxGeometry(railingThickness, railingThickness, railLength),
+        railingMaterial
+    );
+    
+    topRail.position.set(
+        stairStartX + offset,
+        deckHeight/1.25,
+        stairStartZ -( stairDepth*3)
+    );
+    topRail.rotation.x = angle;
+    scene.add(topRail);
+
+    // Vertical posts
+    const postCount = stairCount + 1;
+    for(let i = 0; i < postCount; i++) {
+        const post = new THREE.Mesh(
+            new THREE.BoxGeometry(railingThickness, railingHeight, railingThickness),
+            railingMaterial
+        );
+        post.position.set(
+            stairStartX + offset,
+            i * stairHeight + stairHeight/2,
+            stairStartZ - i * stairDepth
+        );
+        scene.add(post);
+    }
+};
+
+// Add railings to both sides of stairs
+createStairRailing(true);  // Left side
+createStairRailing(false); // Right side
 
 // Position camera for mobile view
 camera.position.set(0, roomSize * 3, roomSize * 3);
@@ -171,13 +368,15 @@ function onTouch(event) {
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(mouse, camera);
     
-    const intersects = raycaster.intersectObjects([door, ...walls]);
+    const deckParts = [deckPlatform]; // Add all deck meshes to this array
+    const intersects = raycaster.intersectObjects([door, ...walls, ...deckParts]);
     
     if (intersects.length > 0) {
         if (intersects[0].object === door) {
             window.location.href = "entrance-page.html";
+        } else if (deckParts.includes(intersects[0].object)) {
+            window.location.href = "deck-building.html";
         }
-        // Add more interactions for other objects if needed
     }
 }
 
