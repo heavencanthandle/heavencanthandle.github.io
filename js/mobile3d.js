@@ -21,7 +21,7 @@ directionalLight.position.set(5, 5, 5);
 scene.add(directionalLight);
 
 // Materials
-const wallMaterial = new THREE.MeshPhongMaterial({ color: 0xf0f0f0 }); // Light gray
+const wallMaterial = new THREE.MeshPhongMaterial({ color: 0x808080 }); // Light gray
 const doorMaterial = new THREE.MeshPhongMaterial({ color: 0x4a3c2b }); // Dark brown
 const couchMaterial = new THREE.MeshPhongMaterial({ color: 0x2e4756 }); // Navy blue
 const lightFixtureMaterial = new THREE.MeshPhongMaterial({ color: 0xb87333 }); // Copper color
