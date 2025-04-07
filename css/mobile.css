@@ -1,0 +1,17 @@
+body { 
+    margin: 0; 
+}
+
+canvas { 
+    display: block; 
+}
+
+#container {
+    width: 100%;
+    height: 80vh; /* Smaller height for mobile */
+}
+
+h1 {
+    font-size: 1.5rem; /* Smaller text for mobile */
+    padding: 10px;
+} 
