@@ -127,7 +127,7 @@ floor.rotation.x = -Math.PI/2;
 scene.add(floor);
 
 // Position camera for mobile view
-camera.position.set(0, roomSize * 0.8, roomSize * 0.8);
+camera.position.set(0, roomSize * 1.5, roomSize * 1.5);
 camera.lookAt(0, 0, 0);
 
 // Add mobile-friendly controls
