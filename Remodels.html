@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitchen Model</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xf0f0f0);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Add OrbitControls
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        camera.position.set(5, 5, 5);
+        controls.update();
+
+        // Materials
+        const counterMaterial = new THREE.MeshPhongMaterial({ color: 0x999999 }); // Grey counter
+        const cabinetMaterial = new THREE.MeshPhongMaterial({ color: 0x8b4513 }); // Wood color
+        const sinkMaterial = new THREE.MeshPhongMaterial({ color: 0xc0c0c0 }); // Silver
+        const wallMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff }); // White
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(5, 5, 5);
+        scene.add(directionalLight);
+
+        // Room dimensions
+        const roomWidth = 8;
+        const roomDepth = 6;
+        const roomHeight = 4;
+
+        // Back wall
+        const backWall = new THREE.Mesh(
+            new THREE.BoxGeometry(roomWidth, roomHeight, 0.1),
+            wallMaterial
+        );
+        backWall.position.set(0, roomHeight/2, -roomDepth/2);
+        scene.add(backWall);
+
+        // Side wall
+        const sideWall = new THREE.Mesh(
+            new THREE.BoxGeometry(0.1, roomHeight, roomDepth),
+            wallMaterial
+        );
+        sideWall.position.set(-roomWidth/2, roomHeight/2, 0);
+        scene.add(sideWall);
+
+        // Counter base
+        const counterHeight = 0.9;
+        const counterDepth = 0.6;
+        const counter = new THREE.Mesh(
+            new THREE.BoxGeometry(roomWidth, 0.1, counterDepth),
+            counterMaterial
+        );
+        counter.position.set(0, counterHeight, -roomDepth/2 + counterDepth/2);
+        scene.add(counter);
+
+        // Base cabinets
+        const cabinetWidth = 0.8;
+        for(let x = -roomWidth/2 + cabinetWidth/2; x < roomWidth/2; x += cabinetWidth) {
+            const cabinet = new THREE.Mesh(
+                new THREE.BoxGeometry(cabinetWidth-0.05, counterHeight, counterDepth-0.05),
+                cabinetMaterial
+            );
+            cabinet.position.set(x, counterHeight/2, -roomDepth/2 + counterDepth/2);
+            scene.add(cabinet);
+        }
+
+        // Sink
+        const sink = new THREE.Mesh(
+            new THREE.BoxGeometry(1, 0.2, 0.5),
+            sinkMaterial
+        );
+        sink.position.set(0, counterHeight + 0.1, -roomDepth/2 + counterDepth/2);
+        scene.add(sink);
+
+        // Upper cabinets
+        const upperCabinetHeight = 0.8;
+        for(let x = -roomWidth/2 + cabinetWidth/2; x < roomWidth/2; x += cabinetWidth) {
+            const upperCabinet = new THREE.Mesh(
+                new THREE.BoxGeometry(cabinetWidth-0.05, upperCabinetHeight, counterDepth-0.15),
+                cabinetMaterial
+            );
+            upperCabinet.position.set(x, roomHeight - upperCabinetHeight/2, -roomDepth/2 + counterDepth/2);
+            scene.add(upperCabinet);
+        }
+
+        // Floor
+        const floor = new THREE.Mesh(
+            new THREE.BoxGeometry(roomWidth, 0.1, roomDepth),
+            new THREE.MeshPhongMaterial({ color: 0xcccccc })
+        );
+        floor.position.set(0, 0, 0);
+        scene.add(floor);
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle window resizing
+        window.addEventListener('resize', onWindowResize, false);
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+    </script>
+</body>
+</html>
