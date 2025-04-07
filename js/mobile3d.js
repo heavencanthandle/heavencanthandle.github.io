@@ -34,7 +34,7 @@ const lightBulbMaterial = new THREE.MeshPhongMaterial({
 // Room dimensions (based on door size)
 const doorWidth = 0.5;
 const doorHeight = 1;
-const roomSize = doorWidth * 4;
+const roomSize = doorWidth * 9;
 const wallHeight = doorHeight * 2;
 const wallThickness = 0.1;
 
@@ -68,7 +68,7 @@ scene.add(door);
 
 // Create couch
 const couchBase = new THREE.Mesh(
-    new THREE.BoxGeometry(roomSize/2, doorHeight/2, roomSize/4),
+    new THREE.BoxGeometry(roomSize/2, doorHeight/3, roomSize/4),
     couchMaterial
 );
 couchBase.position.set(-roomSize/4, doorHeight/4, -roomSize/4);
@@ -76,7 +76,7 @@ scene.add(couchBase);
 
 // Couch backrest
 const couchBack = new THREE.Mesh(
-    new THREE.BoxGeometry(roomSize/2, doorHeight/1.2, roomSize/8),
+    new THREE.BoxGeometry(roomSize/2, doorHeight/2, roomSize/8),
     couchMaterial
 );
 couchBack.position.set(-roomSize/4, doorHeight/1.5, -roomSize/3);
@@ -127,7 +127,7 @@ floor.rotation.x = -Math.PI/2;
 scene.add(floor);
 
 // Position camera for mobile view
-camera.position.set(0, roomSize * 1.5, roomSize * 1.5);
+camera.position.set(0, roomSize * 3, roomSize * 3);
 camera.lookAt(0, 0, 0);
 
 // Add mobile-friendly controls
