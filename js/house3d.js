@@ -471,7 +471,7 @@ const originalColors = {
 
 // Create arrays of interactive objects
 const interactiveObjects = [
-    { mesh: door, color: originalColors.door, link: "entrance-page.html" },
+    { mesh: door, color: originalColors.door, link: "handyman.html" },
     { mesh: deckPlatform, color: originalColors.deck, link: "deck-building.html" }
 ];
 

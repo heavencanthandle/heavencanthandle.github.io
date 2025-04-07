@@ -493,7 +493,7 @@ function onTouch(event) {
     
     if (intersects.length > 0) {
         if (intersects[0].object === door) {
-            window.location.href = "entrance-page.html";
+            window.location.href = "handyman.html";
         } else if (deckParts.includes(intersects[0].object)) {
             window.location.href = "deck-building.html";
         }
