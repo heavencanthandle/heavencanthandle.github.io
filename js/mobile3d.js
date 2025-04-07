@@ -78,21 +78,141 @@ const door = new THREE.Mesh(
 door.position.set(0, doorHeight/2, roomSize/2);
 scene.add(door);
 
-// Create couch
+// Adjusted couch dimensions (smaller)
+const couchHeight = doorHeight/2;
+const couchWidth = doorHeight * 0.8; // Made narrower
+const couchDepth = doorHeight * 0.6; // Made less deep
+
+// Create couch base (seat) - positioned against back wall
 const couchBase = new THREE.Mesh(
-    new THREE.BoxGeometry(roomSize/2, doorHeight/3, roomSize/4),
+    new THREE.BoxGeometry(couchWidth, couchHeight/2, couchDepth),
     couchMaterial
 );
-couchBase.position.set(-roomSize/4, doorHeight/4, -roomSize/4);
+couchBase.position.set(
+    -roomSize/4,           // Centered on left side
+    couchHeight/4,         // Half the base height
+    -roomSize/2 + couchDepth/2  // Against back wall
+);
 scene.add(couchBase);
 
 // Couch backrest
 const couchBack = new THREE.Mesh(
-    new THREE.BoxGeometry(roomSize/2, doorHeight/2, roomSize/8),
+    new THREE.BoxGeometry(couchWidth, couchHeight/2, couchDepth/4),
     couchMaterial
 );
-couchBack.position.set(-roomSize/4, doorHeight/1.5, -roomSize/3);
+couchBack.position.set(
+    -roomSize/4,                    // Same X as base
+    couchHeight * 0.75,            // Above the base
+    -roomSize/2 + couchDepth/8     // Against back wall
+);
 scene.add(couchBack);
+
+// Adjusted armrests
+const armrestWidth = couchDepth/4;
+const armrestHeight = couchHeight/2;
+
+// Left armrest
+const leftArmrest = new THREE.Mesh(
+    new THREE.BoxGeometry(armrestWidth, armrestHeight, couchDepth),
+    couchMaterial
+);
+leftArmrest.position.set(
+    -roomSize/4 - couchWidth/2 + armrestWidth/2,
+    couchHeight/2,
+    -roomSize/2 + couchDepth/2
+);
+scene.add(leftArmrest);
+
+// Right armrest
+const rightArmrest = new THREE.Mesh(
+    new THREE.BoxGeometry(armrestWidth, armrestHeight, couchDepth),
+    couchMaterial
+);
+rightArmrest.position.set(
+    -roomSize/4 + couchWidth/2 - armrestWidth/2,
+    couchHeight/2,
+    -roomSize/2 + couchDepth/2
+);
+scene.add(rightArmrest);
+
+// Add interior walls
+const interiorWallHeight = wallHeight * 0.75; // 3/4 height of exterior walls
+const interiorWallThickness = wallThickness/2; // Thinner than exterior walls
+
+// Function to create interior walls
+const createInteriorWall = (length, x, z, rotation = 0) => {
+    const wall = new THREE.Mesh(
+        new THREE.BoxGeometry(length, interiorWallHeight, interiorWallThickness),
+        new THREE.MeshPhongMaterial({ color: 0xf5f5f5 }) // Slightly off-white
+    );
+    wall.position.set(x, interiorWallHeight/2, z);
+    wall.rotation.y = rotation;
+    scene.add(wall);
+    return wall;
+};
+
+// Create interior walls to form rooms
+// Hallway wall
+createInteriorWall(
+    roomSize * 0.6, // Length
+    0,              // X position
+    -roomSize/6,    // Z position
+    0               // No rotation
+);
+
+// Kitchen divider
+createInteriorWall(
+    roomSize * 0.4,    // Length
+    roomSize/4,        // X position
+    0,                 // Z position
+    Math.PI/2          // 90 degrees rotation
+);
+
+// Living room divider
+createInteriorWall(
+    roomSize * 0.4,    // Length
+    -roomSize/4,       // X position
+    0,                 // Z position
+    Math.PI/2          // 90 degrees rotation
+);
+
+// Add doorways in interior walls
+const createDoorway = (width, height, x, z, rotation = 0) => {
+    // Create door frame
+    const frameThickness = interiorWallThickness;
+    const frameWidth = 0.1;
+    
+    // Top frame
+    const topFrame = new THREE.Mesh(
+        new THREE.BoxGeometry(width + frameWidth*2, frameWidth, frameThickness),
+        new THREE.MeshPhongMaterial({ color: 0x8b4513 })
+    );
+    topFrame.position.set(x, height, z);
+    topFrame.rotation.y = rotation;
+    scene.add(topFrame);
+
+    // Side frames
+    const leftFrame = new THREE.Mesh(
+        new THREE.BoxGeometry(frameWidth, height, frameThickness),
+        new THREE.MeshPhongMaterial({ color: 0x8b4513 })
+    );
+    leftFrame.position.set(x - width/2 - frameWidth/2, height/2, z);
+    leftFrame.rotation.y = rotation;
+    scene.add(leftFrame);
+
+    const rightFrame = new THREE.Mesh(
+        new THREE.BoxGeometry(frameWidth, height, frameThickness),
+        new THREE.MeshPhongMaterial({ color: 0x8b4513 })
+    );
+    rightFrame.position.set(x + width/2 + frameWidth/2, height/2, z);
+    rightFrame.rotation.y = rotation;
+    scene.add(rightFrame);
+};
+
+// Add doorways
+createDoorway(doorWidth * 1.2, doorHeight * 0.9, 0, -roomSize/6, 0);  // Hallway
+createDoorway(doorWidth * 1.2, doorHeight * 0.9, roomSize/4, 0, Math.PI/2);  // Kitchen
+createDoorway(doorWidth * 1.2, doorHeight * 0.9, -roomSize/4, 0, Math.PI/2); // Living room
 
 // Create wall sconces
 const createSconce = (x, z, rotationY) => {

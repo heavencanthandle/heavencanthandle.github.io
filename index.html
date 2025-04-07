@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About me (Kitty)</title>
+    <title>Careful Carpenter</title>
     <!-- Add Three.js library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <!-- Add OrbitControls import -->
@@ -16,18 +16,76 @@
         }
     </script>
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+        }
         canvas {
             display: block;
         }
         #container {
             width: 100%;
             height: 100vh;
+            position: relative;
+        }
+        .header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .logo {
+            width: 100px;
+            height: 100px;
+            background-color: #333;
+            margin-bottom: 10px;
+            border-radius: 50%;
+        }
+        .title {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .nav-menu a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: rgba(0, 0, 0, 0.5);
+            transition: background-color 0.3s;
+        }
+        .nav-menu a:hover {
+            background-color: rgba(0, 0, 0, 0.8);
         }
     </style>
 </head>
 <body>
-    <h1>About me (Kitty)</h1>
-    <div id="container"></div>
+    <div id="container">
+        <div class="header">
+            <div class="logo"></div>
+            <div class="title">Careful Carpenter</div>
+            <div class="nav-menu">
+                <a href="Remodels.html">Remodels</a>
+                <a href="New-Construction.html">New Construction</a>
+                <a href="deck-building.html">Deck Building</a>
+                <a href="handyman.html">Handyman</a>
+                <a href="tiling.html">Tiling</a>
+                <a href="tree-trimming.html">Tree Trimming & Removal</a>
+                <a href="interior-design.html">Interior Design</a>
+                <a href="art-direction.html">Art Direction</a>
+            </div>
+        </div>
+    </div>
     <script src="js/house3d.js"></script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Careful Carpenter - Remodels</title>
+    <title>Careful Carpenter - Handyman Services</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
         body {
@@ -40,7 +40,7 @@
             display: block;
             margin-bottom: 5px;
         }
-        input, textarea {
+        input, textarea, select {
             width: 100%;
             padding: 10px;
             border: none;
@@ -77,27 +77,28 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Remodels</h1>
+            <h1>Handyman Services</h1>
         </div>
         
         <div class="service-description">
-            <h2>Transform Your Space</h2>
-            <p>Our remodeling services can breathe new life into your home. Whether you're looking to update a single room or transform your entire house, we have the expertise to bring your vision to life.</p>
-            <h3>Our Remodeling Services Include:</h3>
+            <h2>Professional Home Repairs & Maintenance</h2>
+            <p>From minor repairs to major maintenance tasks, our handyman services cover all your home improvement needs. We provide reliable, efficient, and high-quality workmanship for all your household projects.</p>
+            <h3>Our Handyman Services Include:</h3>
             <ul>
-                <li>Kitchen Remodels</li>
-                <li>Bathroom Renovations</li>
-                <li>Basement Finishing</li>
-                <li>Room Additions</li>
-                <li>Whole House Remodels</li>
-                <li>Custom Cabinetry</li>
-                <li>Flooring Installation</li>
+                <li>General Repairs</li>
+                <li>Plumbing Fixes</li>
+                <li>Electrical Work</li>
+                <li>Drywall Repair</li>
+                <li>Painting</li>
+                <li>Furniture Assembly</li>
+                <li>Fixture Installation</li>
+                <li>Door & Window Repairs</li>
             </ul>
         </div>
 
         <div class="contact-form">
-            <h2>Request a Free Quote</h2>
-            <form id="remodelForm">
+            <h2>Schedule a Service</h2>
+            <form id="handymanForm">
                 <div class="form-group">
                     <label for="name">Name:</label>
                     <input type="text" id="name" name="name" required>
@@ -111,32 +112,37 @@
                     <input type="tel" id="phone" name="phone" required>
                 </div>
                 <div class="form-group">
-                    <label for="projectType">Type of Remodel:</label>
-                    <select id="projectType" name="projectType" required>
-                        <option value="">Select a project type</option>
-                        <option value="kitchen">Kitchen Remodel</option>
-                        <option value="bathroom">Bathroom Renovation</option>
-                        <option value="basement">Basement Finishing</option>
-                        <option value="addition">Room Addition</option>
-                        <option value="whole-house">Whole House Remodel</option>
+                    <label for="serviceType">Type of Service Needed:</label>
+                    <select id="serviceType" name="serviceType" required>
+                        <option value="">Select a service type</option>
+                        <option value="repair">General Repair</option>
+                        <option value="plumbing">Plumbing</option>
+                        <option value="electrical">Electrical</option>
+                        <option value="drywall">Drywall</option>
+                        <option value="painting">Painting</option>
+                        <option value="assembly">Furniture Assembly</option>
+                        <option value="installation">Fixture Installation</option>
                         <option value="other">Other</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="description">Project Description:</label>
+                    <label for="description">Service Description:</label>
                     <textarea id="description" name="description" required></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="timeline">Preferred Timeline:</label>
-                    <select id="timeline" name="timeline" required>
-                        <option value="">Select a timeline</option>
-                        <option value="asap">As soon as possible</option>
-                        <option value="1-3months">1-3 months</option>
-                        <option value="3-6months">3-6 months</option>
-                        <option value="6+months">6+ months</option>
+                    <label for="preferredDate">Preferred Service Date:</label>
+                    <input type="date" id="preferredDate" name="preferredDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="timePreference">Time Preference:</label>
+                    <select id="timePreference" name="timePreference" required>
+                        <option value="">Select a time preference</option>
+                        <option value="morning">Morning (8am-12pm)</option>
+                        <option value="afternoon">Afternoon (12pm-4pm)</option>
+                        <option value="evening">Evening (4pm-8pm)</option>
                     </select>
                 </div>
-                <button type="submit">Submit Request</button>
+                <button type="submit">Schedule Service</button>
             </form>
         </div>
 
@@ -144,12 +150,12 @@
     </div>
 
     <script>
-        document.getElementById('remodelForm').addEventListener('submit', function(e) {
+        document.getElementById('handymanForm').addEventListener('submit', function(e) {
             e.preventDefault();
             // Here you would typically send the form data to your server
-            alert('Thank you for your request! We will contact you shortly to discuss your project.');
+            alert('Thank you for your request! We will contact you shortly to confirm your service appointment.');
             this.reset();
         });
     </script>
 </body>
-</html>
+</html> 

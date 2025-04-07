@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Careful Carpenter - Remodels</title>
+    <title>Careful Carpenter - Tiling Services</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
         body {
@@ -40,7 +40,7 @@
             display: block;
             margin-bottom: 5px;
         }
-        input, textarea {
+        input, textarea, select {
             width: 100%;
             padding: 10px;
             border: none;
@@ -77,27 +77,28 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Remodels</h1>
+            <h1>Tiling Services</h1>
         </div>
         
         <div class="service-description">
-            <h2>Transform Your Space</h2>
-            <p>Our remodeling services can breathe new life into your home. Whether you're looking to update a single room or transform your entire house, we have the expertise to bring your vision to life.</p>
-            <h3>Our Remodeling Services Include:</h3>
+            <h2>Professional Tile Installation & Repair</h2>
+            <p>Transform your space with our expert tiling services. Whether it's a bathroom, kitchen, or any other area, we provide high-quality tile installation and repair services to enhance your home's beauty and functionality.</p>
+            <h3>Our Tiling Services Include:</h3>
             <ul>
-                <li>Kitchen Remodels</li>
-                <li>Bathroom Renovations</li>
-                <li>Basement Finishing</li>
-                <li>Room Additions</li>
-                <li>Whole House Remodels</li>
-                <li>Custom Cabinetry</li>
-                <li>Flooring Installation</li>
+                <li>Bathroom Tile Installation</li>
+                <li>Kitchen Backsplash</li>
+                <li>Floor Tile Installation</li>
+                <li>Shower Tile Installation</li>
+                <li>Tile Repair & Replacement</li>
+                <li>Custom Tile Design</li>
+                <li>Grout Cleaning & Sealing</li>
+                <li>Mosaic Tile Work</li>
             </ul>
         </div>
 
         <div class="contact-form">
-            <h2>Request a Free Quote</h2>
-            <form id="remodelForm">
+            <h2>Request a Quote</h2>
+            <form id="tilingForm">
                 <div class="form-group">
                     <label for="name">Name:</label>
                     <input type="text" id="name" name="name" required>
@@ -111,14 +112,31 @@
                     <input type="tel" id="phone" name="phone" required>
                 </div>
                 <div class="form-group">
-                    <label for="projectType">Type of Remodel:</label>
+                    <label for="projectType">Type of Tiling Project:</label>
                     <select id="projectType" name="projectType" required>
                         <option value="">Select a project type</option>
-                        <option value="kitchen">Kitchen Remodel</option>
-                        <option value="bathroom">Bathroom Renovation</option>
-                        <option value="basement">Basement Finishing</option>
-                        <option value="addition">Room Addition</option>
-                        <option value="whole-house">Whole House Remodel</option>
+                        <option value="bathroom">Bathroom Tiling</option>
+                        <option value="kitchen">Kitchen Backsplash</option>
+                        <option value="floor">Floor Tiling</option>
+                        <option value="shower">Shower Tiling</option>
+                        <option value="repair">Tile Repair</option>
+                        <option value="custom">Custom Design</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="areaSize">Approximate Area Size (sq ft):</label>
+                    <input type="number" id="areaSize" name="areaSize" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="tileType">Preferred Tile Type:</label>
+                    <select id="tileType" name="tileType" required>
+                        <option value="">Select a tile type</option>
+                        <option value="ceramic">Ceramic</option>
+                        <option value="porcelain">Porcelain</option>
+                        <option value="natural-stone">Natural Stone</option>
+                        <option value="glass">Glass</option>
+                        <option value="mosaic">Mosaic</option>
                         <option value="other">Other</option>
                     </select>
                 </div>
@@ -131,12 +149,12 @@
                     <select id="timeline" name="timeline" required>
                         <option value="">Select a timeline</option>
                         <option value="asap">As soon as possible</option>
-                        <option value="1-3months">1-3 months</option>
-                        <option value="3-6months">3-6 months</option>
-                        <option value="6+months">6+ months</option>
+                        <option value="1-2weeks">1-2 weeks</option>
+                        <option value="2-4weeks">2-4 weeks</option>
+                        <option value="1+month">1+ month</option>
                     </select>
                 </div>
-                <button type="submit">Submit Request</button>
+                <button type="submit">Request Quote</button>
             </form>
         </div>
 
@@ -144,12 +162,12 @@
     </div>
 
     <script>
-        document.getElementById('remodelForm').addEventListener('submit', function(e) {
+        document.getElementById('tilingForm').addEventListener('submit', function(e) {
             e.preventDefault();
             // Here you would typically send the form data to your server
-            alert('Thank you for your request! We will contact you shortly to discuss your project.');
+            alert('Thank you for your request! We will contact you shortly with a quote for your tiling project.');
             this.reset();
         });
     </script>
 </body>
-</html>
+</html> 

@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Careful Carpenter - Remodels</title>
+    <title>Careful Carpenter - New Construction</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
         body {
             margin: 0;
             padding: 0;
             background-color: #1a1a1a;
-            color: #ffffff;
+            color: #ffffff; 
             font-family: Arial, sans-serif;
         }
         .container {
@@ -40,7 +40,7 @@
             display: block;
             margin-bottom: 5px;
         }
-        input, textarea {
+        input, textarea, select {
             width: 100%;
             padding: 10px;
             border: none;
@@ -77,27 +77,27 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Remodels</h1>
+            <h1>New Construction</h1>
         </div>
         
         <div class="service-description">
-            <h2>Transform Your Space</h2>
-            <p>Our remodeling services can breathe new life into your home. Whether you're looking to update a single room or transform your entire house, we have the expertise to bring your vision to life.</p>
-            <h3>Our Remodeling Services Include:</h3>
+            <h2>Build Your Dream Home</h2>
+            <p>From foundation to finish, we handle every aspect of new home construction with precision and care. Our team works closely with you to bring your vision to life, ensuring quality craftsmanship at every step.</p>
+            <h3>Our New Construction Services Include:</h3>
             <ul>
-                <li>Kitchen Remodels</li>
-                <li>Bathroom Renovations</li>
-                <li>Basement Finishing</li>
-                <li>Room Additions</li>
-                <li>Whole House Remodels</li>
-                <li>Custom Cabinetry</li>
-                <li>Flooring Installation</li>
+                <li>Custom Home Building</li>
+                <li>Architectural Design Consultation</li>
+                <li>Foundation Work</li>
+                <li>Framing and Structural Work</li>
+                <li>Electrical and Plumbing Installation</li>
+                <li>Interior and Exterior Finishing</li>
+                <li>Energy-Efficient Building Practices</li>
             </ul>
         </div>
 
         <div class="contact-form">
-            <h2>Request a Free Quote</h2>
-            <form id="remodelForm">
+            <h2>Start Your Project</h2>
+            <form id="constructionForm">
                 <div class="form-group">
                     <label for="name">Name:</label>
                     <input type="text" id="name" name="name" required>
@@ -111,16 +111,19 @@
                     <input type="tel" id="phone" name="phone" required>
                 </div>
                 <div class="form-group">
-                    <label for="projectType">Type of Remodel:</label>
+                    <label for="projectType">Type of Construction:</label>
                     <select id="projectType" name="projectType" required>
                         <option value="">Select a project type</option>
-                        <option value="kitchen">Kitchen Remodel</option>
-                        <option value="bathroom">Bathroom Renovation</option>
-                        <option value="basement">Basement Finishing</option>
-                        <option value="addition">Room Addition</option>
-                        <option value="whole-house">Whole House Remodel</option>
+                        <option value="single-family">Single Family Home</option>
+                        <option value="multi-family">Multi-Family Home</option>
+                        <option value="custom">Custom Home</option>
+                        <option value="spec">Spec Home</option>
                         <option value="other">Other</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label for="squareFootage">Approximate Square Footage:</label>
+                    <input type="number" id="squareFootage" name="squareFootage" min="500" required>
                 </div>
                 <div class="form-group">
                     <label for="description">Project Description:</label>
@@ -131,9 +134,9 @@
                     <select id="timeline" name="timeline" required>
                         <option value="">Select a timeline</option>
                         <option value="asap">As soon as possible</option>
-                        <option value="1-3months">1-3 months</option>
                         <option value="3-6months">3-6 months</option>
-                        <option value="6+months">6+ months</option>
+                        <option value="6-12months">6-12 months</option>
+                        <option value="12+months">12+ months</option>
                     </select>
                 </div>
                 <button type="submit">Submit Request</button>
@@ -144,7 +147,7 @@
     </div>
 
     <script>
-        document.getElementById('remodelForm').addEventListener('submit', function(e) {
+        document.getElementById('constructionForm').addEventListener('submit', function(e) {
             e.preventDefault();
             // Here you would typically send the form data to your server
             alert('Thank you for your request! We will contact you shortly to discuss your project.');
@@ -152,4 +155,4 @@
         });
     </script>
 </body>
-</html>
+</html> 

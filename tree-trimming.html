@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Careful Carpenter - Remodels</title>
+    <title>Careful Carpenter - Tree Trimming & Removal</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
         body {
@@ -40,7 +40,7 @@
             display: block;
             margin-bottom: 5px;
         }
-        input, textarea {
+        input, textarea, select {
             width: 100%;
             padding: 10px;
             border: none;
@@ -77,27 +77,28 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Remodels</h1>
+            <h1>Tree Trimming & Removal</h1>
         </div>
         
         <div class="service-description">
-            <h2>Transform Your Space</h2>
-            <p>Our remodeling services can breathe new life into your home. Whether you're looking to update a single room or transform your entire house, we have the expertise to bring your vision to life.</p>
-            <h3>Our Remodeling Services Include:</h3>
+            <h2>Professional Tree Care Services</h2>
+            <p>Keep your property safe and beautiful with our expert tree care services. From routine maintenance to emergency removal, we handle all your tree care needs with professional equipment and experienced arborists.</p>
+            <h3>Our Tree Services Include:</h3>
             <ul>
-                <li>Kitchen Remodels</li>
-                <li>Bathroom Renovations</li>
-                <li>Basement Finishing</li>
-                <li>Room Additions</li>
-                <li>Whole House Remodels</li>
-                <li>Custom Cabinetry</li>
-                <li>Flooring Installation</li>
+                <li>Tree Trimming & Pruning</li>
+                <li>Tree Removal</li>
+                <li>Stump Grinding</li>
+                <li>Emergency Tree Services</li>
+                <li>Tree Health Assessment</li>
+                <li>Hazardous Tree Removal</li>
+                <li>Land Clearing</li>
+                <li>Tree Planting</li>
             </ul>
         </div>
 
         <div class="contact-form">
-            <h2>Request a Free Quote</h2>
-            <form id="remodelForm">
+            <h2>Request a Service</h2>
+            <form id="treeForm">
                 <div class="form-group">
                     <label for="name">Name:</label>
                     <input type="text" id="name" name="name" required>
@@ -111,15 +112,40 @@
                     <input type="tel" id="phone" name="phone" required>
                 </div>
                 <div class="form-group">
-                    <label for="projectType">Type of Remodel:</label>
-                    <select id="projectType" name="projectType" required>
-                        <option value="">Select a project type</option>
-                        <option value="kitchen">Kitchen Remodel</option>
-                        <option value="bathroom">Bathroom Renovation</option>
-                        <option value="basement">Basement Finishing</option>
-                        <option value="addition">Room Addition</option>
-                        <option value="whole-house">Whole House Remodel</option>
+                    <label for="serviceType">Type of Service Needed:</label>
+                    <select id="serviceType" name="serviceType" required>
+                        <option value="">Select a service type</option>
+                        <option value="trimming">Tree Trimming</option>
+                        <option value="removal">Tree Removal</option>
+                        <option value="stump">Stump Grinding</option>
+                        <option value="emergency">Emergency Service</option>
+                        <option value="assessment">Tree Health Assessment</option>
+                        <option value="planting">Tree Planting</option>
                         <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="treeCount">Number of Trees:</label>
+                    <input type="number" id="treeCount" name="treeCount" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="treeSize">Approximate Tree Size:</label>
+                    <select id="treeSize" name="treeSize" required>
+                        <option value="">Select tree size</option>
+                        <option value="small">Small (under 20ft)</option>
+                        <option value="medium">Medium (20-40ft)</option>
+                        <option value="large">Large (40-60ft)</option>
+                        <option value="xlarge">Extra Large (60ft+)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="access">Access to Trees:</label>
+                    <select id="access" name="access" required>
+                        <option value="">Select access type</option>
+                        <option value="easy">Easy Access</option>
+                        <option value="moderate">Moderate Access</option>
+                        <option value="difficult">Difficult Access</option>
+                        <option value="very-difficult">Very Difficult Access</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -130,13 +156,13 @@
                     <label for="timeline">Preferred Timeline:</label>
                     <select id="timeline" name="timeline" required>
                         <option value="">Select a timeline</option>
+                        <option value="emergency">Emergency (24 hours)</option>
                         <option value="asap">As soon as possible</option>
-                        <option value="1-3months">1-3 months</option>
-                        <option value="3-6months">3-6 months</option>
-                        <option value="6+months">6+ months</option>
+                        <option value="1-2weeks">1-2 weeks</option>
+                        <option value="2-4weeks">2-4 weeks</option>
                     </select>
                 </div>
-                <button type="submit">Submit Request</button>
+                <button type="submit">Request Service</button>
             </form>
         </div>
 
@@ -144,12 +170,12 @@
     </div>
 
     <script>
-        document.getElementById('remodelForm').addEventListener('submit', function(e) {
+        document.getElementById('treeForm').addEventListener('submit', function(e) {
             e.preventDefault();
             // Here you would typically send the form data to your server
-            alert('Thank you for your request! We will contact you shortly to discuss your project.');
+            alert('Thank you for your request! We will contact you shortly to discuss your tree service needs.');
             this.reset();
         });
     </script>
 </body>
-</html>
+</html> 

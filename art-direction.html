@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Careful Carpenter - Remodels</title>
+    <title>Careful Carpenter - Art Direction</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
         body {
@@ -40,7 +40,7 @@
             display: block;
             margin-bottom: 5px;
         }
-        input, textarea {
+        input, textarea, select {
             width: 100%;
             padding: 10px;
             border: none;
@@ -77,27 +77,28 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Remodels</h1>
+            <h1>Art Direction</h1>
         </div>
         
         <div class="service-description">
-            <h2>Transform Your Space</h2>
-            <p>Our remodeling services can breathe new life into your home. Whether you're looking to update a single room or transform your entire house, we have the expertise to bring your vision to life.</p>
-            <h3>Our Remodeling Services Include:</h3>
+            <h2>Creative Vision & Design Direction</h2>
+            <p>Bring your artistic vision to life with our expert art direction services. We help create cohesive, visually stunning spaces that tell your story through carefully curated design elements and artistic details.</p>
+            <h3>Our Art Direction Services Include:</h3>
             <ul>
-                <li>Kitchen Remodels</li>
-                <li>Bathroom Renovations</li>
-                <li>Basement Finishing</li>
-                <li>Room Additions</li>
-                <li>Whole House Remodels</li>
-                <li>Custom Cabinetry</li>
-                <li>Flooring Installation</li>
+                <li>Space Styling</li>
+                <li>Art Curation</li>
+                <li>Custom Artwork Commission</li>
+                <li>Gallery Wall Design</li>
+                <li>Color & Texture Coordination</li>
+                <li>Lighting Design</li>
+                <li>Furniture & Accessory Selection</li>
+                <li>Complete Space Transformation</li>
             </ul>
         </div>
 
         <div class="contact-form">
-            <h2>Request a Free Quote</h2>
-            <form id="remodelForm">
+            <h2>Start Your Art Direction Project</h2>
+            <form id="artForm">
                 <div class="form-group">
                     <label for="name">Name:</label>
                     <input type="text" id="name" name="name" required>
@@ -111,15 +112,50 @@
                     <input type="tel" id="phone" name="phone" required>
                 </div>
                 <div class="form-group">
-                    <label for="projectType">Type of Remodel:</label>
+                    <label for="projectType">Type of Art Direction Project:</label>
                     <select id="projectType" name="projectType" required>
                         <option value="">Select a project type</option>
-                        <option value="kitchen">Kitchen Remodel</option>
-                        <option value="bathroom">Bathroom Renovation</option>
-                        <option value="basement">Basement Finishing</option>
-                        <option value="addition">Room Addition</option>
-                        <option value="whole-house">Whole House Remodel</option>
+                        <option value="residential">Residential Space</option>
+                        <option value="commercial">Commercial Space</option>
+                        <option value="gallery">Gallery/Exhibition</option>
+                        <option value="event">Event Space</option>
                         <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="spaceType">Space Type:</label>
+                    <select id="spaceType" name="spaceType" required>
+                        <option value="">Select space type</option>
+                        <option value="living">Living Area</option>
+                        <option value="office">Office/Work Space</option>
+                        <option value="retail">Retail Space</option>
+                        <option value="restaurant">Restaurant/Bar</option>
+                        <option value="gallery">Gallery Space</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="stylePreference">Preferred Artistic Style:</label>
+                    <select id="stylePreference" name="stylePreference" required>
+                        <option value="">Select a style</option>
+                        <option value="contemporary">Contemporary</option>
+                        <option value="modern">Modern</option>
+                        <option value="minimalist">Minimalist</option>
+                        <option value="eclectic">Eclectic</option>
+                        <option value="industrial">Industrial</option>
+                        <option value="traditional">Traditional</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="budget">Project Budget Range:</label>
+                    <select id="budget" name="budget" required>
+                        <option value="">Select budget range</option>
+                        <option value="under-10k">Under $10,000</option>
+                        <option value="10k-25k">$10,000 - $25,000</option>
+                        <option value="25k-50k">$25,000 - $50,000</option>
+                        <option value="50k-100k">$50,000 - $100,000</option>
+                        <option value="100k+">$100,000+</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -136,7 +172,7 @@
                         <option value="6+months">6+ months</option>
                     </select>
                 </div>
-                <button type="submit">Submit Request</button>
+                <button type="submit">Start Project</button>
             </form>
         </div>
 
@@ -144,12 +180,12 @@
     </div>
 
     <script>
-        document.getElementById('remodelForm').addEventListener('submit', function(e) {
+        document.getElementById('artForm').addEventListener('submit', function(e) {
             e.preventDefault();
             // Here you would typically send the form data to your server
-            alert('Thank you for your request! We will contact you shortly to discuss your project.');
+            alert('Thank you for your request! We will contact you shortly to discuss your art direction project.');
             this.reset();
         });
     </script>
 </body>
-</html>
+</html> 
