@@ -447,109 +447,154 @@ createStairRailing(false); // Right side
 camera.position.set(0, roomSize * 3, roomSize * 3);
 camera.lookAt(0, 0, 0);
 
-// Desktop-specific controls
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.05;
-controls.maxPolarAngle = Math.PI/2;
-controls.minPolarAngle = 0;
-controls.enableZoom = true;
-controls.maxDistance = roomSize * 1.5;
-controls.minDistance = roomSize/2;
+// Detect if the user is on a mobile device
+const isMobile = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini//i.test(navigator.userAgent);
 
-// Raycaster for mouse interaction
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
+// Adjust controls based on device type
+let controls;
+if (isMobile) {
+    // Mobile-friendly controls
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.maxPolarAngle = Math.PI / 2;
+    controls.minPolarAngle = 0;
+    controls.enableZoom = true;
+    controls.maxDistance = roomSize * 1.5;
+    controls.minDistance = roomSize / 2;
 
-// Store original colors
-const originalColors = {
-    house: 0x808080 ,
-    roof: 0x8b4513,
-    door: 0x4a3c2b,
-    deck: 0x8b4513
-};
+    // Add touch interaction for mobile
+    function onTouch(event) {
+        event.preventDefault();
+        const touch = event.touches[0];
+        const container = document.getElementById('container');
+        const rect = container.getBoundingClientRect();
 
-// Create arrays of interactive objects
-const interactiveObjects = [
-    { mesh: door, color: originalColors.door, link: "handyman.html" },
-    { mesh: deckPlatform, color: originalColors.deck, link: "deck-building.html" }
-];
+        const mouse = {
+            x: ((touch.clientX - rect.left) / container.clientWidth) * 2 - 1,
+            y: -((touch.clientY - rect.top) / container.clientHeight) * 2 + 1
+        };
 
-// Add walls to interactive objects
-walls.forEach(wall => {
-    interactiveObjects.push({
-        mesh: wall,
-        color: originalColors.house,
-        link: "another-page.html"
-    });
-});
+        raycaster.setFromCamera(mouse, camera);
 
-// Function to lighten a hex color
-function lightenColor(hex, percent) {
-    const num = parseInt(hex.toString(), 16);
-    const amt = Math.round(2.55 * percent);
-    const R = (num >> 16) + amt;
-    const G = (num >> 8 & 0x00FF) + amt;
-    const B = (num & 0x0000FF) + amt;
+        const deckParts = [deckPlatform]; // Add all deck meshes to this array
+        const intersects = raycaster.intersectObjects([door, ...walls, ...deckParts]);
 
-    return (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
-        (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
-        (B < 255 ? B < 1 ? 0 : B : 255));
-}
-
-// Mouse move handler for hover effects
-function onMouseMove(event) {
-    // Calculate mouse position relative to renderer
-    const rect = renderer.domElement.getBoundingClientRect();
-    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-    raycaster.setFromCamera(mouse, camera);
-    
-    // Reset all objects to original colors
-    interactiveObjects.forEach(obj => {
-        obj.mesh.material.color.setHex(obj.color);
-    });
-
-    // Check for intersections
-    const intersects = raycaster.intersectObjects(interactiveObjects.map(obj => obj.mesh));
-
-    if (intersects.length > 0) {
-        const hoveredObject = intersects[0].object;
-        const objData = interactiveObjects.find(obj => obj.mesh === hoveredObject);
-        if (objData) {
-            hoveredObject.material.color.setHex(lightenColor(objData.color, 30));
-            document.body.style.cursor = 'pointer';
-        }
-    } else {
-        document.body.style.cursor = 'default';
-    }
-}
-
-// Mouse click handler
-function onClick(event) {
-    // Calculate mouse position relative to renderer
-    const rect = renderer.domElement.getBoundingClientRect();
-    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-    raycaster.setFromCamera(mouse, camera);
-    
-    // Check for intersections
-    const intersects = raycaster.intersectObjects(interactiveObjects.map(obj => obj.mesh));
-
-    if (intersects.length > 0) {
-        const clickedObject = intersects[0].object;
-        const objData = interactiveObjects.find(obj => obj.mesh === clickedObject);
-        if (objData) {
-            window.location.href = objData.link;
+        if (intersects.length > 0) {
+            if (intersects[0].object === door) {
+                window.location.href = "handyman.html";
+            } else if (deckParts.includes(intersects[0].object)) {
+                window.location.href = "deck-building.html";
+            }
         }
     }
-}
 
-// Add event listeners to renderer element
-renderer.domElement.addEventListener('mousemove', onMouseMove);
-renderer.domElement.addEventListener('click', onClick);
+    renderer.domElement.addEventListener('touchstart', onTouch, false);
+} else {
+    // Desktop-specific controls
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.maxPolarAngle = Math.PI / 2;
+    controls.minPolarAngle = 0;
+    controls.enableZoom = true;
+    controls.maxDistance = roomSize * 1.5;
+    controls.minDistance = roomSize / 2;
+
+    // Raycaster for mouse interaction
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    // Store original colors
+    const originalColors = {
+        house: 0x808080 ,
+        roof: 0x8b4513,
+        door: 0x4a3c2b,
+        deck: 0x8b4513
+    };
+
+    // Create arrays of interactive objects
+    const interactiveObjects = [
+        { mesh: door, color: originalColors.door, link: "handyman.html" },
+        { mesh: deckPlatform, color: originalColors.deck, link: "deck-building.html" }
+    ];
+
+    // Add walls to interactive objects
+    walls.forEach(wall => {
+        interactiveObjects.push({
+            mesh: wall,
+            color: originalColors.house,
+            link: "another-page.html"
+        });
+    });
+
+    // Function to lighten a hex color
+    function lightenColor(hex, percent) {
+        const num = parseInt(hex.toString(), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = (num >> 16) + amt;
+        const G = (num >> 8 & 0x00FF) + amt;
+        const B = (num & 0x0000FF) + amt;
+
+        return (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+            (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+            (B < 255 ? B < 1 ? 0 : B : 255));
+    }
+
+    // Mouse move handler for hover effects
+    function onMouseMove(event) {
+        // Calculate mouse position relative to renderer
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        
+        // Reset all objects to original colors
+        interactiveObjects.forEach(obj => {
+            obj.mesh.material.color.setHex(obj.color);
+        });
+
+        // Check for intersections
+        const intersects = raycaster.intersectObjects(interactiveObjects.map(obj => obj.mesh));
+
+        if (intersects.length > 0) {
+            const hoveredObject = intersects[0].object;
+            const objData = interactiveObjects.find(obj => obj.mesh === hoveredObject);
+            if (objData) {
+                hoveredObject.material.color.setHex(lightenColor(objData.color, 30));
+                document.body.style.cursor = 'pointer';
+            }
+        } else {
+            document.body.style.cursor = 'default';
+        }
+    }
+
+    // Mouse click handler
+    function onClick(event) {
+        // Calculate mouse position relative to renderer
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        
+        // Check for intersections
+        const intersects = raycaster.intersectObjects(interactiveObjects.map(obj => obj.mesh));
+
+        if (intersects.length > 0) {
+            const clickedObject = intersects[0].object;
+            const objData = interactiveObjects.find(obj => obj.mesh === clickedObject);
+            if (objData) {
+                window.location.href = objData.link;
+            }
+        }
+    }
+
+    // Add event listeners for desktop
+    renderer.domElement.addEventListener('mousemove', onMouseMove);
+    renderer.domElement.addEventListener('click', onClick);
+}
 
 // Animation loop
 function animate() {
@@ -565,4 +610,4 @@ function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-} 
+}
