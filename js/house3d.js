@@ -448,7 +448,7 @@ camera.position.set(0, roomSize * 3, roomSize * 3);
 camera.lookAt(0, 0, 0);
 
 // Detect if the user is on a mobile device
-const isMobile = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini//i.test(navigator.userAgent);
+const isMobile = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
 // Adjust controls based on device type
 let controls;
