@@ -53,10 +53,10 @@ const railingThickness = 0.02; // Much thinner railings
 // Create walls
 const walls = [];
 const wallPositions = [
-    { x: 0, z: -roomSize/2, rotation: 0 }, // Back wall
-    { x: 0, z: roomSize/2, rotation: 0 },  // Front wall
-    { x: -roomSize/2, z: 0, rotation: Math.PI/2 }, // Left wall
-    { x: roomSize/2, z: 0, rotation: Math.PI/2 }  // Right wall
+    { x: 0, z: (-roomSize/2)+(wallThickness/2), rotation: 0 }, // Back wall
+    { x: 0, z: roomSize/2-(wallThickness/2), rotation: 0 },  // Front wall
+    { x: -roomSize/2+(wallThickness/2), z: 0, rotation: Math.PI/2 }, // Left wall
+    { x: roomSize/2-(wallThickness/2), z: 0, rotation: Math.PI/2 }  // Right wall
 ];
 
 wallPositions.forEach(pos => {
