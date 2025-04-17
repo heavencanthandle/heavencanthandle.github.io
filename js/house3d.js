@@ -136,7 +136,7 @@ rightArmrest.position.set(
 scene.add(rightArmrest);
 
 // Add interior walls
-const interiorWallHeight = wallHeight * 0.75; // 3/4 height of exterior walls
+const interiorWallHeight = wallHeight; // Match height of exterior walls
 const interiorWallThickness = wallThickness/2; // Thinner than exterior walls
 
 // Function to create interior walls
@@ -175,6 +175,18 @@ createInteriorWall(
     0,                 // Z position
     Math.PI/2          // 90 degrees rotation
 );
+
+// Reorganize interior walls
+// Hallway
+createInteriorWall(roomSize * 0.3, 0, -roomSize / 4, 0);
+
+// Living room
+createInteriorWall(roomSize * 0.5, -roomSize / 4, 0, Math.PI / 2);
+createInteriorWall(roomSize * 0.5, roomSize / 4, 0, Math.PI / 2);
+
+// Bedroom
+createInteriorWall(roomSize * 0.4, -roomSize / 4, roomSize / 4, 0);
+createInteriorWall(roomSize * 0.4, -roomSize / 4, roomSize / 2, Math.PI / 2);
 
 // Add doorways in interior walls
 const createDoorway = (width, height, x, z, rotation = 0) => {
@@ -443,6 +455,69 @@ const createStairRailing = (isLeft) => {
 createStairRailing(true);  // Left side
 createStairRailing(false); // Right side
 
+// Simplify tree addition
+const treeTrunk = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.2, 0.2, 3),
+    new THREE.MeshPhongMaterial({ color: 0x8b4513 })
+);
+treeTrunk.position.set(-roomSize, 1.5, -roomSize / 2);
+scene.add(treeTrunk);
+
+const treeLeaves = new THREE.Mesh(
+    new THREE.SphereGeometry(1.5, 16, 16),
+    new THREE.MeshPhongMaterial({ color: 0x228B22 })
+);
+treeLeaves.position.set(-roomSize, 3.5, -roomSize / 2);
+scene.add(treeLeaves);
+
+// Simplify interactive objects
+const interactiveObjects = [];
+interactiveObjects.push({ mesh: treeTrunk, link: "tree-trimming.html" });
+interactiveObjects.push({ mesh: treeLeaves, link: "tree-trimming.html" });
+
+// Add a bed to the bedroom
+const bedBase = new THREE.Mesh(
+    new THREE.BoxGeometry(1.5, 0.2, 2),
+    new THREE.MeshPhongMaterial({ color: 0x8B0000 }) // Red bed base
+);
+bedBase.position.set(-roomSize / 4, 0.1, roomSize / 3);
+scene.add(bedBase);
+
+const bedMattress = new THREE.Mesh(
+    new THREE.BoxGeometry(1.5, 0.3, 2),
+    new THREE.MeshPhongMaterial({ color: 0xFFFFFF }) // White mattress
+);
+bedMattress.position.set(-roomSize / 4, 0.4, roomSize / 3);
+scene.add(bedMattress);
+
+// Kitchen
+createInteriorWall(roomSize * 0.4, roomSize / 4, roomSize / 4, 0);
+createInteriorWall(roomSize * 0.4, roomSize / 4, roomSize / 2, Math.PI / 2);
+
+// Add kitchen cabinets
+const cabinet = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 0.5, 0.5),
+    new THREE.MeshPhongMaterial({ color: 0xD2B48C }) // Tan cabinets
+);
+cabinet.position.set(roomSize / 4, 0.25, roomSize / 3);
+scene.add(cabinet);
+
+interactiveObjects.push({ mesh: cabinet, link: "Remodels.html" });
+
+// Bathroom
+createInteriorWall(roomSize * 0.3, 0, roomSize / 2, 0);
+createInteriorWall(roomSize * 0.3, roomSize / 4, roomSize / 2, Math.PI / 2);
+
+// Add a glass-walled shower
+const showerGlass = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 2, 1),
+    new THREE.MeshPhongMaterial({ color: 0x87CEEB, transparent: true, opacity: 0.5 }) // Transparent blue glass
+);
+showerGlass.position.set(0, 1, roomSize / 1.8);
+scene.add(showerGlass);
+
+interactiveObjects.push({ mesh: showerGlass, link: "Remodels.html" });
+
 // Position camera for mobile view
 camera.position.set(0, roomSize * 3, roomSize * 3);
 camera.lookAt(0, 0, 0);
@@ -501,87 +576,39 @@ if (isMobile) {
     controls.maxDistance = roomSize * 1.5;
     controls.minDistance = roomSize / 2;
 
-    // Raycaster for mouse interaction
+    // Fix unhighlighting issue by storing original colors
+    interactiveObjects.forEach(obj => {
+        obj.originalColor = obj.mesh.material.color.getHex(); // Store original color
+    });
+
+    // Simplify mouse interaction logic
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
-    // Store original colors
-    const originalColors = {
-        house: 0x808080 ,
-        roof: 0x8b4513,
-        door: 0x4a3c2b,
-        deck: 0x8b4513
-    };
-
-    // Create arrays of interactive objects
-    const interactiveObjects = [
-        { mesh: door, color: originalColors.door, link: "handyman.html" },
-        { mesh: deckPlatform, color: originalColors.deck, link: "deck-building.html" }
-    ];
-
-    // Add walls to interactive objects
-    walls.forEach(wall => {
-        interactiveObjects.push({
-            mesh: wall,
-            color: originalColors.house,
-            link: "another-page.html"
-        });
-    });
-
-    // Function to lighten a hex color
-    function lightenColor(hex, percent) {
-        const num = parseInt(hex.toString(), 16);
-        const amt = Math.round(2.55 * percent);
-        const R = (num >> 16) + amt;
-        const G = (num >> 8 & 0x00FF) + amt;
-        const B = (num & 0x0000FF) + amt;
-
-        return (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
-            (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
-            (B < 255 ? B < 1 ? 0 : B : 255));
-    }
-
-    // Mouse move handler for hover effects
     function onMouseMove(event) {
-        // Calculate mouse position relative to renderer
-        const rect = renderer.domElement.getBoundingClientRect();
-        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(mouse, camera);
-        
-        // Reset all objects to original colors
+
+        const intersects = raycaster.intersectObjects(interactiveObjects.map(obj => obj.mesh));
+
         interactiveObjects.forEach(obj => {
-            obj.mesh.material.color.setHex(obj.color);
+            if (intersects.find(intersect => intersect.object === obj.mesh)) {
+                obj.mesh.material.color.set(0xffff00); // Highlight color (yellow)
+            } else {
+                obj.mesh.material.color.set(obj.originalColor); // Reset to original color
+            }
         });
 
-        // Check for intersections
-        const intersects = raycaster.intersectObjects(interactiveObjects.map(obj => obj.mesh));
-
-        if (intersects.length > 0) {
-            const hoveredObject = intersects[0].object;
-            const objData = interactiveObjects.find(obj => obj.mesh === hoveredObject);
-            if (objData) {
-                hoveredObject.material.color.setHex(lightenColor(objData.color, 30));
-                document.body.style.cursor = 'pointer';
-            }
-        } else {
-            document.body.style.cursor = 'default';
-        }
+        document.body.style.cursor = intersects.length > 0 ? 'pointer' : 'default';
     }
 
-    // Mouse click handler
     function onClick(event) {
-        // Calculate mouse position relative to renderer
-        const rect = renderer.domElement.getBoundingClientRect();
-        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(mouse, camera);
-        
-        // Check for intersections
-        const intersects = raycaster.intersectObjects(interactiveObjects.map(obj => obj.mesh));
 
+        const intersects = raycaster.intersectObjects(interactiveObjects.map(obj => obj.mesh));
         if (intersects.length > 0) {
             const clickedObject = intersects[0].object;
             const objData = interactiveObjects.find(obj => obj.mesh === clickedObject);
@@ -591,7 +618,6 @@ if (isMobile) {
         }
     }
 
-    // Add event listeners for desktop
     renderer.domElement.addEventListener('mousemove', onMouseMove);
     renderer.domElement.addEventListener('click', onClick);
 }

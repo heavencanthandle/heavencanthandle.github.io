@@ -176,6 +176,26 @@ createInteriorWall(
     Math.PI/2          // 90 degrees rotation
 );
 
+// Reorganize interior walls
+// Hallway
+createInteriorWall(roomSize * 0.3, 0, -roomSize / 4, 0);
+
+// Living room
+createInteriorWall(roomSize * 0.5, -roomSize / 4, 0, Math.PI / 2);
+createInteriorWall(roomSize * 0.5, roomSize / 4, 0, Math.PI / 2);
+
+// Bedroom
+createInteriorWall(roomSize * 0.4, -roomSize / 4, roomSize / 4, 0);
+createInteriorWall(roomSize * 0.4, -roomSize / 4, roomSize / 2, Math.PI / 2);
+
+// Kitchen
+createInteriorWall(roomSize * 0.4, roomSize / 4, roomSize / 4, 0);
+createInteriorWall(roomSize * 0.4, roomSize / 4, roomSize / 2, Math.PI / 2);
+
+// Bathroom
+createInteriorWall(roomSize * 0.3, 0, roomSize / 2, 0);
+createInteriorWall(roomSize * 0.3, roomSize / 4, roomSize / 2, Math.PI / 2);
+
 // Add doorways in interior walls
 const createDoorway = (width, height, x, z, rotation = 0) => {
     // Create door frame
@@ -443,6 +463,52 @@ const createStairRailing = (isLeft) => {
 createStairRailing(true);  // Left side
 createStairRailing(false); // Right side
 
+// Add a tree model
+const treeTrunk = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.2, 0.2, 3),
+    new THREE.MeshPhongMaterial({ color: 0x8b4513 }) // Brown trunk
+);
+treeTrunk.position.set(-roomSize, 1.5, -roomSize / 2);
+scene.add(treeTrunk);
+
+const treeLeaves = new THREE.Mesh(
+    new THREE.SphereGeometry(1.5, 16, 16),
+    new THREE.MeshPhongMaterial({ color: 0x228B22 }) // Green leaves
+);
+treeLeaves.position.set(-roomSize, 3.5, -roomSize / 2);
+scene.add(treeLeaves);
+
+// Add a bed to the bedroom
+const bedBase = new THREE.Mesh(
+    new THREE.BoxGeometry(1.5, 0.2, 2),
+    new THREE.MeshPhongMaterial({ color: 0x8B0000 }) // Red bed base
+);
+bedBase.position.set(-roomSize / 4, 0.1, roomSize / 3);
+scene.add(bedBase);
+
+const bedMattress = new THREE.Mesh(
+    new THREE.BoxGeometry(1.5, 0.3, 2),
+    new THREE.MeshPhongMaterial({ color: 0xFFFFFF }) // White mattress
+);
+bedMattress.position.set(-roomSize / 4, 0.4, roomSize / 3);
+scene.add(bedMattress);
+
+// Add kitchen cabinets
+const cabinet = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 0.5, 0.5),
+    new THREE.MeshPhongMaterial({ color: 0xD2B48C }) // Tan cabinets
+);
+cabinet.position.set(roomSize / 4, 0.25, roomSize / 3);
+scene.add(cabinet);
+
+// Add a glass-walled shower
+const showerGlass = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 2, 1),
+    new THREE.MeshPhongMaterial({ color: 0x87CEEB, transparent: true, opacity: 0.5 }) // Transparent blue glass
+);
+showerGlass.position.set(0, 1, roomSize / 1.8);
+scene.add(showerGlass);
+
 // Position camera for mobile view
 camera.position.set(0, roomSize * 3, roomSize * 3);
 camera.lookAt(0, 0, 0);
@@ -500,4 +566,4 @@ function onTouch(event) {
     }
 }
 
-renderer.domElement.addEventListener('touchstart', onTouch, false); 
+renderer.domElement.addEventListener('touchstart', onTouch, false);
