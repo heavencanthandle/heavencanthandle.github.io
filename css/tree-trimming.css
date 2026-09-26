@@ -1,0 +1,36 @@
+/* Tree Trimming Styles */
+body {
+    background-color: #f0f5e9; /* Pale green */
+    color: #2f4f4f; /* Dark slate gray */
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+header {
+    background-color: #6b8e23; /* Olive green */
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+header h1 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+main {
+    padding: 20px;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+footer {
+    background-color: #556b2f; /* Dark olive green */
+    color: white;
+    text-align: center;
+    padding: 10px;
+}

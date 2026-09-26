@@ -1,0 +1,36 @@
+/* Interior Design Styles */
+body {
+    background-color: #f5fffa; /* Mint cream */
+    color: #006400; /* Dark green */
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+header {
+    background-color: #2e8b57; /* Sea green */
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+header h1 {
+    font-size: 2.4rem;
+    margin: 0;
+}
+
+main {
+    padding: 20px;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 20px;
+}
+
+footer {
+    background-color: #3cb371; /* Medium sea green */
+    color: white;
+    text-align: center;
+    padding: 10px;
+}

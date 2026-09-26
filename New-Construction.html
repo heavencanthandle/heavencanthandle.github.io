@@ -4,83 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Careful Carpenter - New Construction</title>
-    <link rel="stylesheet" href="css/general-styles.css">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #1a1a1a;
-            color: #ffffff; 
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .service-description {
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-        .contact-form {
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-        }
-        textarea {
-            height: 150px;
-            resize: vertical;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .back-link {
-            display: inline-block;
-            margin-top: 20px;
-            color: #ffffff;
-            text-decoration: none;
-        }
-        .back-link:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <link rel="stylesheet" href="css/service-page.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
+            <p class="eyebrow">Careful Carpenter</p>
             <h1>New Construction</h1>
+            <p class="lead">Ground-up homes delivered with sharp planning, premium materials, and a transparent build process.</p>
         </div>
         
-        <div class="service-description">
+        <div class="card service-description">
             <h2>Build Your Dream Home</h2>
             <p>From foundation to finish, we handle every aspect of new home construction with precision and care. Our team works closely with you to bring your vision to life, ensuring quality craftsmanship at every step.</p>
             <h3>Our New Construction Services Include:</h3>
@@ -95,9 +29,10 @@
             </ul>
         </div>
 
-        <div class="contact-form">
-            <h2>Start Your Project</h2>
+        <div class="card contact-form">
+            <h2>Request a Bid</h2>
             <form id="constructionForm">
+                <div class="grid">
                 <div class="form-group">
                     <label for="name">Name:</label>
                     <input type="text" id="name" name="name" required>
@@ -125,8 +60,8 @@
                     <label for="squareFootage">Approximate Square Footage:</label>
                     <input type="number" id="squareFootage" name="squareFootage" min="500" required>
                 </div>
-                <div class="form-group">
-                    <label for="description">Project Description:</label>
+                <div class="form-group span-2">
+                    <label for="description">Project Description</label>
                     <textarea id="description" name="description" required></textarea>
                 </div>
                 <div class="form-group">
@@ -139,6 +74,7 @@
                         <option value="12+months">12+ months</option>
                     </select>
                 </div>
+                </div>
                 <button type="submit">Submit Request</button>
             </form>
         </div>
@@ -149,8 +85,7 @@
     <script>
         document.getElementById('constructionForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            // Here you would typically send the form data to your server
-            alert('Thank you for your request! We will contact you shortly to discuss your project.');
+            alert('Thanks for reaching out. We will contact you to schedule your construction bid.');
             this.reset();
         });
     </script>

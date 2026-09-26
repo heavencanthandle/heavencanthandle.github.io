@@ -1,0 +1,36 @@
+/* Tiling Styles */
+body {
+    background-color: #f0f8ff; /* Alice blue */
+    color: #2f4f4f; /* Dark slate gray */
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+header {
+    background-color: #4682b4; /* Steel blue */
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+header h1 {
+    font-size: 2.3rem;
+    margin: 0;
+}
+
+main {
+    padding: 20px;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+footer {
+    background-color: #5f9ea0; /* Cadet blue */
+    color: white;
+    text-align: center;
+    padding: 10px;
+}

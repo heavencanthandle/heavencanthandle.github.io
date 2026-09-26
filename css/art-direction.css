@@ -1,0 +1,36 @@
+/* Art Direction Styles */
+body {
+    background-color: #fdf5e6; /* Old lace */
+    color: #8b4513; /* Saddle brown */
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+header {
+    background-color: #deb887; /* Burlywood */
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+header h1 {
+    font-size: 2.4rem;
+    margin: 0;
+}
+
+main {
+    padding: 20px;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 20px;
+}
+
+footer {
+    background-color: #d2b48c; /* Tan */
+    color: white;
+    text-align: center;
+    padding: 10px;
+}

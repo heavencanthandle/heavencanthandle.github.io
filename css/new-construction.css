@@ -1,0 +1,36 @@
+/* New Construction Styles */
+body {
+    background-color: #fffacd; /* Lemon chiffon */
+    color: #8b4513; /* Saddle brown */
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+header {
+    background-color: #daa520; /* Goldenrod */
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+header h1 {
+    font-size: 2.6rem;
+    margin: 0;
+}
+
+main {
+    padding: 20px;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+footer {
+    background-color: #b8860b; /* Dark goldenrod */
+    color: white;
+    text-align: center;
+    padding: 10px;
+}

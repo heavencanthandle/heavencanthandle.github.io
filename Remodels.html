@@ -4,86 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Careful Carpenter - Remodels</title>
-    <link rel="stylesheet" href="css/general-styles.css">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #1a1a1a;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .service-description {
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-        .contact-form {
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-        }
-        textarea {
-            height: 150px;
-            resize: vertical;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .back-link {
-            display: inline-block;
-            margin-top: 20px;
-            color: #ffffff;
-            text-decoration: none;
-        }
-        .back-link:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <link rel="stylesheet" href="css/service-page.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
+            <p class="eyebrow">Careful Carpenter</p>
             <h1>Remodels</h1>
+            <p class="lead">Kitchen, bath, and full-home remodels built with clean execution and careful scheduling.</p>
         </div>
-        
-        <div class="service-description">
+
+        <div class="card service-description">
             <h2>Transform Your Space</h2>
-            <p>Our remodeling services can breathe new life into your home. Whether you're looking to update a single room or transform your entire house, we have the expertise to bring your vision to life.</p>
-            <h3>Our Remodeling Services Include:</h3>
+            <p>From layout updates to finish selections, we manage each phase so your remodel feels smooth and intentional.</p>
+            <h3>Popular Remodel Services</h3>
             <ul>
                 <li>Kitchen Remodels</li>
                 <li>Bathroom Renovations</li>
@@ -95,9 +29,10 @@
             </ul>
         </div>
 
-        <div class="contact-form">
-            <h2>Request a Free Quote</h2>
+        <div class="card contact-form">
+            <h2>Request a Bid</h2>
             <form id="remodelForm">
+                <div class="grid">
                 <div class="form-group">
                     <label for="name">Name:</label>
                     <input type="text" id="name" name="name" required>
@@ -111,7 +46,7 @@
                     <input type="tel" id="phone" name="phone" required>
                 </div>
                 <div class="form-group">
-                    <label for="projectType">Type of Remodel:</label>
+                    <label for="projectType">Project Type:</label>
                     <select id="projectType" name="projectType" required>
                         <option value="">Select a project type</option>
                         <option value="kitchen">Kitchen Remodel</option>
@@ -122,8 +57,8 @@
                         <option value="other">Other</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="description">Project Description:</label>
+                <div class="form-group span-2">
+                    <label for="description">Project Description</label>
                     <textarea id="description" name="description" required></textarea>
                 </div>
                 <div class="form-group">
@@ -136,6 +71,7 @@
                         <option value="6+months">6+ months</option>
                     </select>
                 </div>
+                </div>
                 <button type="submit">Submit Request</button>
             </form>
         </div>
@@ -146,8 +82,7 @@
     <script>
         document.getElementById('remodelForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            // Here you would typically send the form data to your server
-            alert('Thank you for your request! We will contact you shortly to discuss your project.');
+            alert('Thanks for reaching out. We will contact you to schedule your remodeling bid.');
             this.reset();
         });
     </script>

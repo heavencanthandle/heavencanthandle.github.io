@@ -3,44 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deck Building Portfolio</title>
-    <link rel="stylesheet" href="css/deck-building.css">
+    <title>Careful Carpenter - Deck Building</title>
+    <link rel="stylesheet" href="css/service-page.css">
 </head>
 <body>
-    <header>
-        <h1>Custom Deck Builds</h1>
-        <p>A showcase of craftsmanship and outdoor living spaces</p>
-    </header>
+    <div class="container">
+        <div class="header">
+            <p class="eyebrow">Careful Carpenter</p>
+            <h1>Custom Deck Building</h1>
+            <p class="lead">Outdoor living spaces designed for durability, comfort, and a premium architectural look.</p>
+        </div>
 
-    <main>
-        <section class="gallery">
-            <article class="deck-project">
-                <img src="images/deck1.jpg" alt="Multi-level deck with pergola">
-                <div class="project-description">
-                    <h2>Multi-Level Entertainment Deck</h2>
-                    <p>Custom built cedar deck featuring multiple levels and integrated pergola.</p>
-                </div>
-            </article>
-
-            <article class="deck-project">
-                <img src="images/deck2.jpg" alt="Wraparound deck with built-in seating">
-                <div class="project-description">
-                    <h2>Wraparound Deck with Built-ins</h2>
-                    <p>Pressure-treated pine deck with custom built-in seating and planters.</p>
-                </div>
-            </article>
-
-            <article class="deck-project">
-                <img src="images/deck3.jpg" alt="Modern composite deck">
-                <div class="project-description">
-                    <h2>Modern Composite Deck</h2>
-                    <p>Low-maintenance composite decking with aluminum railings and LED lighting.</p>
-                </div>
-            </article>
-        </section>
-
-        <section class="features">
-            <h2>Our Deck Building Features</h2>
+        <section class="card">
+            <h2>Deck Services</h2>
             <ul>
                 <li>Custom designs tailored to your space</li>
                 <li>High-quality materials and craftsmanship</li>
@@ -49,10 +24,50 @@
                 <li>Multiple material options available</li>
             </ul>
         </section>
-    </main>
 
-    <footer>
-        <p>© 2024 Custom Deck Building. All rights reserved.</p>
-    </footer>
+        <section class="card contact-form">
+            <h2>Request a Deck Bid</h2>
+            <form id="deckForm">
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectType">Deck Type</label>
+                        <select id="projectType" name="projectType" required>
+                            <option value="">Select deck type</option>
+                            <option value="single-level">Single-Level Deck</option>
+                            <option value="multi-level">Multi-Level Deck</option>
+                            <option value="covered">Covered Deck</option>
+                            <option value="repair">Deck Repair</option>
+                        </select>
+                    </div>
+                    <div class="form-group span-2">
+                        <label for="description">Project Description</label>
+                        <textarea id="description" name="description" required></textarea>
+                    </div>
+                </div>
+                <button type="submit">Request Quote</button>
+            </form>
+        </section>
+
+        <a href="index.html" class="back-link">← Back to Home</a>
+    </div>
+    <script>
+        document.getElementById('deckForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thanks for your request. We will contact you to schedule your deck bid.');
+            this.reset();
+        });
+    </script>
 </body>
-</html> 
+</html>

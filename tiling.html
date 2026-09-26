@@ -4,83 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Careful Carpenter - Tiling Services</title>
-    <link rel="stylesheet" href="css/general-styles.css">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #1a1a1a;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .service-description {
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-        .contact-form {
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-        }
-        textarea {
-            height: 150px;
-            resize: vertical;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .back-link {
-            display: inline-block;
-            margin-top: 20px;
-            color: #ffffff;
-            text-decoration: none;
-        }
-        .back-link:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <link rel="stylesheet" href="css/service-page.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
+            <p class="eyebrow">Careful Carpenter</p>
             <h1>Tiling Services</h1>
+            <p class="lead">Precision tile work for kitchens, baths, floors, and feature walls with crisp finish details.</p>
         </div>
         
-        <div class="service-description">
+        <div class="card service-description">
             <h2>Professional Tile Installation & Repair</h2>
             <p>Transform your space with our expert tiling services. Whether it's a bathroom, kitchen, or any other area, we provide high-quality tile installation and repair services to enhance your home's beauty and functionality.</p>
             <h3>Our Tiling Services Include:</h3>
@@ -96,9 +30,10 @@
             </ul>
         </div>
 
-        <div class="contact-form">
+        <div class="card contact-form">
             <h2>Request a Quote</h2>
             <form id="tilingForm">
+                <div class="grid">
                 <div class="form-group">
                     <label for="name">Name:</label>
                     <input type="text" id="name" name="name" required>
@@ -140,8 +75,8 @@
                         <option value="other">Other</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="description">Project Description:</label>
+                <div class="form-group span-2">
+                    <label for="description">Project Description</label>
                     <textarea id="description" name="description" required></textarea>
                 </div>
                 <div class="form-group">
@@ -153,6 +88,7 @@
                         <option value="2-4weeks">2-4 weeks</option>
                         <option value="1+month">1+ month</option>
                     </select>
+                </div>
                 </div>
                 <button type="submit">Request Quote</button>
             </form>
