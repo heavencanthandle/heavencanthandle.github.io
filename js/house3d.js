@@ -135,9 +135,9 @@ function makeMountainTexture() {
     }
     // Rock in alpenglow: pink-lit tops fading to dusky purple at the base
     let g = ctx.createLinearGradient(0, 160, 0, 400);
-    g.addColorStop(0, "#cdaab4");
-    g.addColorStop(0.45, "#a797ab");
-    g.addColorStop(1, "#9a8fa5");
+    g.addColorStop(0, "#a07f8f");
+    g.addColorStop(0.45, "#726680");
+    g.addColorStop(1, "#5f5670");
     ridgePath();
     ctx.fillStyle = g;
     ctx.fill();
@@ -145,7 +145,7 @@ function makeMountainTexture() {
     ctx.save();
     ridgePath();
     ctx.clip();
-    ctx.fillStyle = "rgba(246, 226, 226, 0.75)";
+    ctx.fillStyle = "rgba(236, 214, 216, 0.6)";
     ridge.forEach(([x, y], i) => {
         if (i === 0 || y > 262) {
             return;
@@ -160,7 +160,7 @@ function makeMountainTexture() {
         ctx.fill();
     });
     // Shadowed couloirs
-    ctx.fillStyle = "rgba(90, 70, 110, 0.35)";
+    ctx.fillStyle = "rgba(60, 45, 80, 0.45)";
     for (let i = 2; i < ridge.length - 2; i += 3) {
         const [x, y] = ridge[i];
         ctx.beginPath();
@@ -176,11 +176,11 @@ function makeMountainTexture() {
     ctx.save();
     ridgePath();
     ctx.clip();
-    ctx.fillStyle = "rgba(227, 195, 180, 0.22)";
+    ctx.fillStyle = "rgba(227, 195, 180, 0.1)";
     ctx.fillRect(0, 0, c.width, c.height);
-    g = ctx.createLinearGradient(0, 300, 0, 420);
+    g = ctx.createLinearGradient(0, 320, 0, 420);
     g.addColorStop(0, "rgba(227, 195, 180, 0)");
-    g.addColorStop(1, "rgba(227, 195, 180, 0.95)");
+    g.addColorStop(1, "rgba(227, 195, 180, 0.8)");
     ctx.fillStyle = g;
     ctx.fillRect(0, 300, c.width, 120);
     g = ctx.createLinearGradient(0, 0, c.width, 0);
@@ -203,8 +203,8 @@ function makeMountainTexture() {
     ctx.lineTo(c.width, H);
     ctx.closePath();
     g = ctx.createLinearGradient(0, 360, 0, 512);
-    g.addColorStop(0, "#6f7a80");
-    g.addColorStop(0.5, "#8b8a8c");
+    g.addColorStop(0, "#4f5a60");
+    g.addColorStop(0.5, "#6e6d74");
     g.addColorStop(1, "#e3c3b4");
     ctx.fillStyle = g;
     ctx.fill();
@@ -635,8 +635,8 @@ const dropRun = -lowerGroundY / dropSlope;
 const dropLen = -lowerGroundY / Math.sin(dropAngle);
 
 // Front (+Z): flat gravel driveway pad, then the ground falls away into timber
-const padEdgeZ = HALF_D + 11;
-const frontSlope = 0.55;
+const padEdgeZ = HALF_D + 7;
+const frontSlope = 1.05;
 const frontAngle = Math.atan(frontSlope);
 const frontRun = -lowerGroundY / frontSlope;
 const frontLen = -lowerGroundY / Math.sin(frontAngle);
