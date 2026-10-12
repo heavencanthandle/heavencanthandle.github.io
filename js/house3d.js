@@ -1,6 +1,7 @@
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87a8c4);
-scene.fog = new THREE.Fog(0x9eb5c9, 40, 110);
+const HAZE = 0xe3c3b4; // rosy evening haze at the horizon; sky, fog and backdrop all meet on it
+scene.background = new THREE.Color(HAZE);
+scene.fog = new THREE.Fog(HAZE, 45, 130);
 
 // Phones / tablets: coarse pointer or small viewport -> cheaper rendering, wider framing
 const isMobile = (window.matchMedia && window.matchMedia("(hover: none) and (pointer: coarse)").matches) || Math.min(window.innerWidth, window.innerHeight) < 600;
@@ -12,7 +13,7 @@ function fitCameraFov() {
     return aspect < 1 ? Math.min(75, 50 / Math.sqrt(aspect)) : 50;
 }
 
-const camera = new THREE.PerspectiveCamera(fitCameraFov(), window.innerWidth / window.innerHeight, 0.1, 220);
+const camera = new THREE.PerspectiveCamera(fitCameraFov(), window.innerWidth / window.innerHeight, 0.1, 700);
 camera.position.set(-14.5, 7.5, 14.5);
 camera.lookAt(0, 3.0, 0);
 
@@ -46,11 +47,12 @@ controls.addEventListener("end", () => {
 });
 
 // --- Lighting ---
-scene.add(new THREE.HemisphereLight(0xe8f2ff, 0x3d4a32, 0.6));
-scene.add(new THREE.AmbientLight(0xf5f0e6, 0.3));
+// Evening light: warm, low sun from the view (+Z) side, cool lavender fill from behind
+scene.add(new THREE.HemisphereLight(0xf3d7c6, 0x3d4a32, 0.62));
+scene.add(new THREE.AmbientLight(0xf2e2d4, 0.3));
 
-const keyLight = new THREE.DirectionalLight(0xfff6e8, 1.1);
-keyLight.position.set(-12, 22, 16);
+const keyLight = new THREE.DirectionalLight(0xffd3ac, 1.15);
+keyLight.position.set(-10, 13, 24);
 keyLight.castShadow = true;
 keyLight.shadow.mapSize.set(isMobile ? 768 : 1024, isMobile ? 768 : 1024);
 keyLight.shadow.camera.near = 6;
@@ -62,9 +64,169 @@ keyLight.shadow.camera.bottom = -16;
 keyLight.shadow.bias = -0.0006;
 scene.add(keyLight);
 
-const fillLight = new THREE.DirectionalLight(0xa8c4e8, 0.28);
+const fillLight = new THREE.DirectionalLight(0xb9b4e0, 0.3);
 fillLight.position.set(12, 6, -8);
 scene.add(fillLight);
+
+// --- Sky dome + distant mountain backdrop (both ignore fog) ---
+function makeSkyTexture() {
+    const c = document.createElement("canvas");
+    c.width = 1024;
+    c.height = 512;
+    const ctx = c.getContext("2d");
+    const g = ctx.createLinearGradient(0, 0, 0, c.height);
+    g.addColorStop(0.0, "#6b7faa");
+    g.addColorStop(0.28, "#9d94b8");
+    g.addColorStop(0.40, "#d7a9a4");
+    g.addColorStop(0.47, "#f0b893");
+    g.addColorStop(0.50, "#e9c6b2");
+    g.addColorStop(0.52, "#e3c3b4");
+    g.addColorStop(1.0, "#d7bdae");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, c.width, c.height);
+    // Soft sunset clouds in the band above the horizon
+    const clouds = [
+        [120, 150, 180, 26, "#e3b9c0"], [330, 120, 230, 30, "#d9aab8"], [520, 170, 260, 34, "#f1b89a"],
+        [740, 135, 200, 26, "#e7b3b4"], [900, 185, 220, 30, "#f3c1a4"], [60, 215, 160, 18, "#f4c9ad"],
+        [420, 215, 320, 22, "#f6c7a5"], [660, 230, 240, 18, "#f2bf9f"], [980, 110, 150, 22, "#d5a9bb"]
+    ];
+    ctx.shadowBlur = 40;
+    clouds.forEach(([x, y, rx, ry, col]) => {
+        ctx.fillStyle = col;
+        ctx.shadowColor = col;
+        ctx.beginPath();
+        ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+        ctx.fill();
+    });
+    const tex = new THREE.CanvasTexture(c);
+    tex.wrapS = THREE.RepeatWrapping;
+    return tex;
+}
+
+const skyDome = new THREE.Mesh(
+    new THREE.SphereGeometry(520, 24, 14),
+    new THREE.MeshBasicMaterial({ map: makeSkyTexture(), side: THREE.BackSide, fog: false, depthWrite: false })
+);
+skyDome.position.y = -6;
+scene.add(skyDome);
+
+// Rams Horn and the foothills in front of it, painted on a billboard far out on the +Z side
+function makeMountainTexture() {
+    const c = document.createElement("canvas");
+    c.width = 2048;
+    c.height = 512;
+    const ctx = c.getContext("2d");
+    const H = c.height;
+
+    // Main range ridgeline (x, y from top). Rams Horn is the blocky summit right of centre.
+    const ridge = [
+        [0, 330], [120, 318], [230, 300], [330, 308], [420, 290], [500, 296], [590, 278], [660, 262],
+        [730, 270], [800, 250], [860, 238], [905, 246], [940, 222], [975, 206], [1000, 212], [1020, 190],
+        [1048, 176], [1062, 196], [1082, 172], [1110, 164], [1130, 182], [1160, 200], [1215, 220],
+        [1270, 236], [1330, 250], [1400, 244], [1470, 262], [1550, 278], [1640, 290], [1730, 304],
+        [1830, 296], [1920, 312], [2048, 326]
+    ];
+    function ridgePath() {
+        ctx.beginPath();
+        ctx.moveTo(0, H);
+        ridge.forEach(([x, y]) => ctx.lineTo(x, y));
+        ctx.lineTo(c.width, H);
+        ctx.closePath();
+    }
+    // Rock in alpenglow: pink-lit tops fading to dusky purple at the base
+    let g = ctx.createLinearGradient(0, 160, 0, 400);
+    g.addColorStop(0, "#cdaab4");
+    g.addColorStop(0.45, "#a797ab");
+    g.addColorStop(1, "#9a8fa5");
+    ridgePath();
+    ctx.fillStyle = g;
+    ctx.fill();
+    // Snow fields on the upper faces
+    ctx.save();
+    ridgePath();
+    ctx.clip();
+    ctx.fillStyle = "rgba(246, 226, 226, 0.75)";
+    ridge.forEach(([x, y], i) => {
+        if (i === 0 || y > 262) {
+            return;
+        }
+        const [px, py] = ridge[i - 1];
+        ctx.beginPath();
+        ctx.moveTo(px, py);
+        ctx.lineTo(x, y);
+        ctx.lineTo(x + 14, y + 46 + (i % 3) * 12);
+        ctx.lineTo(px - 10, py + 60);
+        ctx.closePath();
+        ctx.fill();
+    });
+    // Shadowed couloirs
+    ctx.fillStyle = "rgba(90, 70, 110, 0.35)";
+    for (let i = 2; i < ridge.length - 2; i += 3) {
+        const [x, y] = ridge[i];
+        ctx.beginPath();
+        ctx.moveTo(x, y + 6);
+        ctx.lineTo(x - 18, y + 120);
+        ctx.lineTo(x + 6, y + 130);
+        ctx.closePath();
+        ctx.fill();
+    }
+    ctx.restore();
+
+    // Distance haze over the whole range, heavier low down and toward the ends (clipped to the rock)
+    ctx.save();
+    ridgePath();
+    ctx.clip();
+    ctx.fillStyle = "rgba(227, 195, 180, 0.22)";
+    ctx.fillRect(0, 0, c.width, c.height);
+    g = ctx.createLinearGradient(0, 300, 0, 420);
+    g.addColorStop(0, "rgba(227, 195, 180, 0)");
+    g.addColorStop(1, "rgba(227, 195, 180, 0.95)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 300, c.width, 120);
+    g = ctx.createLinearGradient(0, 0, c.width, 0);
+    g.addColorStop(0, "rgba(227, 195, 180, 0.8)");
+    g.addColorStop(0.2, "rgba(227, 195, 180, 0)");
+    g.addColorStop(0.8, "rgba(227, 195, 180, 0)");
+    g.addColorStop(1, "rgba(227, 195, 180, 0.8)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.restore();
+
+    // Rolling timbered foothills, closer and darker
+    const hills = [
+        [0, 400], [150, 388], [320, 396], [480, 378], [640, 390], [820, 372], [980, 386], [1140, 368],
+        [1300, 384], [1480, 374], [1660, 392], [1840, 380], [2048, 398]
+    ];
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    hills.forEach(([x, y]) => ctx.lineTo(x, y));
+    ctx.lineTo(c.width, H);
+    ctx.closePath();
+    g = ctx.createLinearGradient(0, 360, 0, 512);
+    g.addColorStop(0, "#6f7a80");
+    g.addColorStop(0.5, "#8b8a8c");
+    g.addColorStop(1, "#e3c3b4");
+    ctx.fillStyle = g;
+    ctx.fill();
+
+    // Fade the whole base into the haze colour so it meets the ground fog seamlessly
+    g = ctx.createLinearGradient(0, 430, 0, H);
+    g.addColorStop(0, "rgba(227, 195, 180, 0)");
+    g.addColorStop(1, "rgba(227, 195, 180, 1)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 430, c.width, H - 430);
+    return new THREE.CanvasTexture(c);
+}
+
+const mountainW = 300;
+const mountainH = mountainW * 512 / 2048;
+const mountains = new THREE.Mesh(
+    new THREE.PlaneGeometry(mountainW, mountainH),
+    new THREE.MeshBasicMaterial({ map: makeMountainTexture(), transparent: true, fog: false, depthWrite: false })
+);
+mountains.rotation.y = Math.PI;             // face back toward the house
+mountains.position.set(0, -30 + mountainH / 2, 240);
+scene.add(mountains);
 
 // --- Geometry builder: merges many boxes / quads into one mesh (fewer draw calls) ---
 class GeoBuilder {
@@ -472,13 +634,20 @@ const lowerGroundY = -9;
 const dropRun = -lowerGroundY / dropSlope;
 const dropLen = -lowerGroundY / Math.sin(dropAngle);
 
-const lowerGround = new THREE.Mesh(new THREE.PlaneGeometry(240, 240), dirtMat);
+// Front (+Z): flat gravel driveway pad, then the ground falls away into timber
+const padEdgeZ = HALF_D + 11;
+const frontSlope = 0.55;
+const frontAngle = Math.atan(frontSlope);
+const frontRun = -lowerGroundY / frontSlope;
+const frontLen = -lowerGroundY / Math.sin(frontAngle);
+
+const lowerGround = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), dirtMat);
 lowerGround.rotation.x = -Math.PI / 2;
 lowerGround.position.y = lowerGroundY - 0.02;
 scene.add(lowerGround);
 
-const pad = new THREE.Mesh(new THREE.BoxGeometry(90, 12, 140), dirtMat);
-pad.position.set(padEdgeX + 45, -6, 0);
+const pad = new THREE.Mesh(new THREE.BoxGeometry(90, 12, padEdgeZ + 70), dirtMat);
+pad.position.set(padEdgeX + 45, -6, (padEdgeZ - 70) / 2);
 pad.receiveShadow = true;
 scene.add(pad);
 
@@ -493,6 +662,42 @@ bank.position.set(
 );
 scene.add(bank);
 
+const frontBank = new THREE.Mesh(new THREE.BoxGeometry(140, bankT, frontLen), bankMat);
+frontBank.rotation.x = -frontAngle;
+frontBank.position.set(
+    0,
+    lowerGroundY / 2 - (bankT / 2) * Math.cos(frontAngle),
+    padEdgeZ + frontRun / 2 - (bankT / 2) * Math.sin(frontAngle)
+);
+frontBank.receiveShadow = true;
+scene.add(frontBank);
+
+function makeGravelTexture() {
+    const c = document.createElement("canvas");
+    c.width = 128;
+    c.height = 128;
+    const ctx = c.getContext("2d");
+    ctx.fillStyle = "#9a8f80";
+    ctx.fillRect(0, 0, 128, 128);
+    const tones = ["#857a6c", "#aca18f", "#776d60", "#b8ad9b", "#8f8577"];
+    for (let i = 0; i < 900; i += 1) {
+        ctx.fillStyle = tones[i % tones.length];
+        const r = 1 + (i % 3);
+        ctx.fillRect((i * 37) % 128, (i * 59 + (i >> 3)) % 128, r, r);
+    }
+    return repeatTex(c);
+}
+const gravelMat = new THREE.MeshStandardMaterial({ map: makeGravelTexture(), roughness: 1, metalness: 0 });
+const gravelX0 = padEdgeX + 0.2;
+const gravelX1 = 8.5;
+const gravelZ0 = HALF_D + 1.5;
+const gravel = new THREE.Mesh(new THREE.PlaneGeometry(gravelX1 - gravelX0, padEdgeZ - gravelZ0), gravelMat);
+gravel.material.map.repeat.set((gravelX1 - gravelX0) / 1.6, (padEdgeZ - gravelZ0) / 1.6);
+gravel.rotation.x = -Math.PI / 2;
+gravel.position.set((gravelX0 + gravelX1) / 2, 0.02, (gravelZ0 + padEdgeZ) / 2);
+gravel.receiveShadow = true;
+scene.add(gravel);
+
 const hillEmergeZ = deckZ1 - 1.6;
 const hillside = new THREE.Mesh(new THREE.BoxGeometry(70, 6, 32), dirtMat);
 hillside.rotation.x = 0.3;
@@ -504,10 +709,12 @@ function terrainY(x, z) {
     if (z < hillEmergeZ && x > padEdgeX - 1) {
         return (hillEmergeZ - z) * 0.31;
     }
-    if (x < padEdgeX) {
-        return Math.max(lowerGroundY, -(padEdgeX - x) * dropSlope);
+    const west = x < padEdgeX ? Math.max(lowerGroundY, -(padEdgeX - x) * dropSlope) : 0;
+    const south = z > padEdgeZ ? Math.max(lowerGroundY, -(z - padEdgeZ) * frontSlope) : 0;
+    if (x < padEdgeX && z > padEdgeZ) {
+        return Math.max(west, south); // the two banks intersect in a spur at the corner
     }
-    return 0;
+    return Math.min(west, south);
 }
 
 const garageCZ = -0.1;
@@ -929,11 +1136,7 @@ for (let i = 0; i < backBays; i += 1) {
 }
 backPostXs.forEach((x) => groundPost(x, backPostZ));
 
-// Rail posts on the back deck: every other bay only
-for (let i = 0; i < backPostXs.length; i += 2) {
-    const next = i + 1 < backPostXs.length ? backPostXs[i + 1] : sidePostX;
-    railPost((backPostXs[i] + next) / 2, backPostZ);
-}
+// Back deck rail is carried by the ground posts alone (no mid-bay posts)
 railPost(-HALF_W + 0.3, backMidZ);
 railPost(-HALF_W + 0.3, deckZ0 - 0.15);
 railPost(deckX0 + 0.12, HALF_D - 0.15);
@@ -1070,6 +1273,25 @@ for (let i = 0; i < 14; i += 1) {
     const z = -22 + i * 3.3;
     if (Math.abs(z - garageCZ) > 4) {
         forestSpots.push([x, z, 1.6 + (i % 3) * 0.25]);
+    }
+}
+
+// Dense timber on the slope below the driveway pad
+for (let row = 0; row < 9; row += 1) {
+    const z = padEdgeZ + 4.5 + row * 4.6;
+    for (let col = 0; col < 19; col += 1) {
+        const x = -41 + col * 4.6 + ((row * 7 + col * 13) % 5) * 0.55 - 1.1;
+        const zj = z + ((row * 11 + col * 3) % 4) * 0.5;
+        forestSpots.push([x, zj, 1.35 + ((row + col) % 4) * 0.18]);
+    }
+}
+// Keep a view corridor open from the man door toward the mountain
+function inViewCorridor(x, z) {
+    return z > padEdgeZ - 2 && Math.abs(x - 1) < 6 + (z - padEdgeZ) * 0.22;
+}
+for (let i = forestSpots.length - 1; i >= 0; i -= 1) {
+    if (inViewCorridor(forestSpots[i][0], forestSpots[i][1])) {
+        forestSpots.splice(i, 1);
     }
 }
 
