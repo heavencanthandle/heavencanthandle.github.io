@@ -2,8 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Careful Carpenter</title>
+    <!-- Fonts for the "Windy Forest Builds" sign painted on the house -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Bebas+Neue&display=swap" rel="stylesheet">
     <!-- Add Three.js library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <!-- Add OrbitControls import -->
@@ -25,11 +29,13 @@
             <div class="brand-row">
                 <div class="logo"></div>
                 <h1 class="title">Careful Carpenter</h1>
+                <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="siteNav">Services</button>
             </div>
             <p class="subtitle">Built details. Clean finish. Reliable timelines.</p>
-            <div class="nav-menu">
+            <div class="nav-menu" id="siteNav">
                 <a href="Remodels.html">Remodels</a>
                 <a href="New-Construction.html">New Construction</a>
+                <a href="timber-framing.html">Timber Framing</a>
                 <a href="deck-building.html">Deck Building</a>
                 <a href="handyman.html">Handyman</a>
                 <a href="tiling.html">Tiling</a>
@@ -38,9 +44,20 @@
                 <a href="art-direction.html">Art Direction</a>
                 <a href="off-grid-consulting.html">Off Grid Consulting</a>
             </div>
-            <p class="interaction-tip">Tip: click the garage, deck, doors, solar panels, or tree in the scene to explore services.</p>
+            <p class="interaction-tip">Tip: tap the garage, truss, deck, doors, solar panels, or tree in the scene to explore services.</p>
         </div>
     </div>
+    <script>
+        (function () {
+            var toggle = document.querySelector(".menu-toggle");
+            var header = document.querySelector(".header");
+            if (!toggle || !header) { return; }
+            toggle.addEventListener("click", function () {
+                var open = header.classList.toggle("is-open");
+                toggle.setAttribute("aria-expanded", open ? "true" : "false");
+            });
+        })();
+    </script>
     <script src="js/house3d.js"></script>
 </body>
 </html>

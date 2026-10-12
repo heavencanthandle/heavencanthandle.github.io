@@ -2,12 +2,22 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87a8c4);
 scene.fog = new THREE.Fog(0x9eb5c9, 40, 110);
 
-const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 220);
+// Phones / tablets: coarse pointer or small viewport -> cheaper rendering, wider framing
+const isMobile = (window.matchMedia && window.matchMedia("(hover: none) and (pointer: coarse)").matches) || Math.min(window.innerWidth, window.innerHeight) < 600;
+const MAX_PIXEL_RATIO = isMobile ? 1.25 : 1.5;
+
+function fitCameraFov() {
+    const aspect = window.innerWidth / window.innerHeight;
+    // Widen the view in portrait so the whole house stays in frame
+    return aspect < 1 ? Math.min(75, 50 / Math.sqrt(aspect)) : 50;
+}
+
+const camera = new THREE.PerspectiveCamera(fitCameraFov(), window.innerWidth / window.innerHeight, 0.1, 220);
 camera.position.set(-14.5, 7.5, 14.5);
 camera.lookAt(0, 3.0, 0);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+const renderer = new THREE.WebGLRenderer({ antialias: !isMobile, powerPreference: "high-performance" });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFShadowMap;
@@ -20,6 +30,7 @@ controls.target.set(0, 3.0, 0);
 controls.maxPolarAngle = Math.PI / 2.02;
 controls.minDistance = 9;
 controls.maxDistance = 36;
+controls.enablePan = !isMobile;
 
 controls.autoRotate = true;
 controls.autoRotateSpeed = 0.18;
@@ -41,7 +52,7 @@ scene.add(new THREE.AmbientLight(0xf5f0e6, 0.3));
 const keyLight = new THREE.DirectionalLight(0xfff6e8, 1.1);
 keyLight.position.set(-12, 22, 16);
 keyLight.castShadow = true;
-keyLight.shadow.mapSize.set(1024, 1024);
+keyLight.shadow.mapSize.set(isMobile ? 768 : 1024, isMobile ? 768 : 1024);
 keyLight.shadow.camera.near = 6;
 keyLight.shadow.camera.far = 60;
 keyLight.shadow.camera.left = -16;
@@ -217,25 +228,119 @@ function makeGarageDoorTexture() {
     c.width = 256;
     c.height = 256;
     const ctx = c.getContext("2d");
-    ctx.fillStyle = "#d6d1c8";
+    ctx.fillStyle = TREX_HEX;
     ctx.fillRect(0, 0, 256, 256);
     const rowH = 64;
     const colW = 64;
     for (let r = 0; r < 4; r += 1) {
         const y0 = r * rowH;
         if (r > 0) {
-            ctx.fillStyle = "#8e887e";
+            ctx.fillStyle = "#1f150e";
             ctx.fillRect(0, y0 - 2, 256, 4);
         }
         for (let col = 0; col < 4; col += 1) {
             const x0 = col * colW;
-            ctx.fillStyle = "#b8b2a8";
+            ctx.fillStyle = "#24170f";
             ctx.fillRect(x0 + 9, y0 + 11, 46, 42);
-            ctx.fillStyle = "#e3dfd7";
+            ctx.fillStyle = "#4a3222";
             ctx.fillRect(x0 + 8, y0 + 10, 46, 42);
         }
     }
     return new THREE.CanvasTexture(c);
+}
+
+// Composite deck boards: dark brown with faint grain streaks. Boards run along v (texture y).
+function makeDeckTexture() {
+    const c = document.createElement("canvas");
+    c.width = 128;
+    c.height = 128;
+    const ctx = c.getContext("2d");
+    const boardW = 32;
+    for (let x = 0; x < c.width; x += boardW) {
+        ctx.fillStyle = (x / boardW) % 2 ? "#412b1d" : "#3b2719";
+        ctx.fillRect(x, 0, boardW, c.height);
+        ctx.fillStyle = "rgba(255, 220, 180, 0.07)";
+        for (let i = 0; i < 4; i += 1) {
+            ctx.fillRect(x + 4 + i * 7, 0, 1, c.height);
+        }
+        ctx.fillStyle = "#1a110b";
+        ctx.fillRect(x + boardW - 3, 0, 3, c.height);
+    }
+    return repeatTex(c);
+}
+
+// "Windy Forest Builds" sign. Draws immediately with fallback fonts, then redraws once web fonts land.
+function makeSignTexture() {
+    const c = document.createElement("canvas");
+    c.width = 1024;
+    c.height = 416;
+    const ctx = c.getContext("2d");
+    const tex = new THREE.CanvasTexture(c);
+    tex.anisotropy = 4;
+
+    function draw() {
+        ctx.clearRect(0, 0, c.width, c.height);
+        ctx.textBaseline = "alphabetic";
+        ctx.textAlign = "left";
+        ctx.fillStyle = "#2a1b12";
+        ctx.strokeStyle = "#2a1b12";
+        ctx.lineWidth = 3;
+        ctx.lineJoin = "round";
+        ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
+        ctx.shadowBlur = 6;
+        ctx.shadowOffsetY = 3;
+
+        // Script line: big loopy W and F, smaller for the rest of each word
+        const script = "'Great Vibes', 'Brush Script MT', 'Segoe Script', cursive";
+        const parts = [
+            { t: "W", s: 215 },
+            { t: "indy ", s: 132 },
+            { t: "F", s: 215 },
+            { t: "orest", s: 132 }
+        ];
+        let total = 0;
+        parts.forEach((p) => {
+            ctx.font = `${p.s}px ${script}`;
+            p.w = ctx.measureText(p.t).width;
+            total += p.w;
+        });
+        let x = (c.width - total) / 2;
+        const baseline = 215;
+        parts.forEach((p) => {
+            ctx.font = `${p.s}px ${script}`;
+            ctx.fillText(p.t, x, baseline);
+            ctx.strokeText(p.t, x, baseline);
+            x += p.w;
+        });
+
+        // Block line underneath
+        const block = "'Bebas Neue', 'Oswald', 'Arial Narrow', Impact, sans-serif";
+        ctx.font = `150px ${block}`;
+        ctx.textAlign = "center";
+        const word = "BUILDS";
+        const spacing = 22;
+        let w = 0;
+        for (const ch of word) {
+            w += ctx.measureText(ch).width + spacing;
+        }
+        w -= spacing;
+        let bx = (c.width - w) / 2;
+        ctx.textAlign = "left";
+        for (const ch of word) {
+            ctx.fillText(ch, bx, 385);
+            bx += ctx.measureText(ch).width + spacing;
+        }
+        tex.needsUpdate = true;
+    }
+
+    draw();
+    if (document.fonts && document.fonts.load) {
+        Promise.all([
+            document.fonts.load("132px 'Great Vibes'"),
+            document.fonts.load("150px 'Bebas Neue'")
+        ]).then(draw).catch(() => {});
+    }
+    return tex;
 }
 
 // Hog-wire mesh: transparent tile with a 2x2 wire grid
@@ -251,9 +356,27 @@ function makeHogWireTexture() {
     return tex;
 }
 
+const TREX_HEX = "#3f2a1c";
 const lapTex = makeLapTexture();
 const corrTex = makeCorrugatedTexture();
 const roofTex = makeRoofTexture();
+const deckTex = makeDeckTexture();
+
+// Decking material; boards run along world Z when alongZ is true, otherwise along X
+function deckBoardMat(sizeX, sizeZ, alongZ) {
+    const tex = deckTex.clone();
+    tex.needsUpdate = true;
+    const boardW = 0.14;
+    if (alongZ) {
+        tex.repeat.set(sizeX / (boardW * 4), 1);
+    } else {
+        // rotated 90deg: texture x now follows box z (repeat.x counts boards along z)
+        tex.center.set(0.5, 0.5);
+        tex.rotation = Math.PI / 2;
+        tex.repeat.set(sizeZ / (boardW * 4), 1);
+    }
+    return new THREE.MeshStandardMaterial({ map: tex, roughness: 0.82, metalness: 0.02 });
+}
 
 function cedarMat(horiz, vert) {
     const tex = lapTex.clone();
@@ -278,6 +401,17 @@ const roofMetal = (() => {
 
 const trimMat = new THREE.MeshStandardMaterial({ color: 0xf2f2ee, roughness: 0.55, metalness: 0.05 });
 const timberMat = new THREE.MeshStandardMaterial({ color: 0xd9c398, roughness: 0.8, metalness: 0.02 });
+const trussMat = new THREE.MeshStandardMaterial({ color: 0xb8945e, roughness: 0.82, metalness: 0.02 });
+const signMat = new THREE.MeshStandardMaterial({
+    map: makeSignTexture(),
+    transparent: true,
+    alphaTest: 0.08,
+    roughness: 0.7,
+    metalness: 0.05,
+    polygonOffset: true,
+    polygonOffsetFactor: -1,
+    polygonOffsetUnits: -1
+});
 const woodMat = new THREE.MeshStandardMaterial({ color: 0x8b6840, roughness: 0.78, metalness: 0.03 });
 const sonoMat = new THREE.MeshStandardMaterial({ color: 0x1f2226, roughness: 0.6, metalness: 0.2 });
 const railMetalMat = new THREE.MeshStandardMaterial({ color: 0x2b2e33, roughness: 0.45, metalness: 0.7 });
@@ -486,10 +620,13 @@ const frontFacade = new THREE.Group();
 frontFacade.position.set(0, 0, HALF_D + WALL_T / 2 + 0.02);
 house.add(frontFacade);
 
-addWindow(frontFacade, 0.6, 0.6, -2.55, 5.05);
-addWindow(frontFacade, 0.6, 0.6, -1.75, 5.05);
-addWindow(frontFacade, 0.45, 1.25, 2.45, 4.75);
+addWindow(frontFacade, 0.75, 1.5, 2.85, 4.85);
 addWindow(frontFacade, 0.55, 0.55, -2.3, 1.95);
+
+// "Windy Forest Builds" lettering on the upper siding, left of centre
+const sign = new THREE.Mesh(new THREE.PlaneGeometry(3.8, 3.8 * 416 / 1024), signMat);
+sign.position.set(-0.6, 4.85, 0.03);
+frontFacade.add(sign);
 addWindow(frontFacade, 0.55, 0.55, 2.3, 1.95);
 
 const serviceDoorGroup = new THREE.Group();
@@ -539,7 +676,6 @@ house.add(garageFacade);
 addWindow(garageFacade, 0.6, 0.6, -2.05, 5.05);
 addWindow(garageFacade, 0.6, 0.6, -1.25, 5.05);
 addWindow(garageFacade, 0.45, 1.25, 2.15, 4.8);
-addWindow(garageFacade, 0.45, 0.45, -2.3, 1.95);
 
 const garageGroup = new THREE.Group();
 garageGroup.position.set(-HALF_W, 0, garageCZ);
@@ -555,6 +691,12 @@ gTrim.box(garageOpenW + 0.2, 0.12, 0.1, 0, gTop + 0.02, doorZ + 0.03);
 gTrim.box(0.12, gTop + 0.08, 0.1, -garageOpenW / 2 - 0.04, gTop / 2, doorZ + 0.03);
 gTrim.box(0.12, gTop + 0.08, 0.1, garageOpenW / 2 + 0.04, gTop / 2, doorZ + 0.03);
 gTrim.mesh(trimMat, garageGroup);
+
+// Timber portico: its own group so the truss can link to Timber Framing
+const porticoGroup = new THREE.Group();
+porticoGroup.position.copy(garageGroup.position);
+porticoGroup.rotation.copy(garageGroup.rotation);
+house.add(porticoGroup);
 
 const wallZ = WALL_T / 2;
 const proj = 1.5;
@@ -600,17 +742,23 @@ const ridgeY = tieY + tieH / 2 + gableRise + 0.12;
 tb.box(0.16, 0.2, proj + 0.4, 0, ridgeY, wallZ + proj / 2);
 [0.33, 0.66].forEach((f) => {
     [-1, 1].forEach((s) => {
-        tb.box(0.12, 0.12, proj + 0.4, s * halfSpan * f, tieY + tieH / 2 + gableRise * (1 - f) + 0.2, wallZ + proj / 2);
+        tb.box(0.12, 0.12, proj + 0.4, s * halfSpan * f, tieY + tieH / 2 + gableRise * (1 - f) + 0.11, wallZ + proj / 2);
     });
 });
-tb.mesh(timberMat, garageGroup);
-footings.mesh(concreteMat, garageGroup);
+tb.mesh(trussMat, porticoGroup);
+footings.mesh(concreteMat, porticoGroup);
 
+// Roof panels sit on the rafters and stop at the ridge line (nothing above the peak)
 const gableRoof = new GeoBuilder();
+const cosR = Math.cos(rafterAng);
+const tanR = Math.tan(rafterAng);
+const panelLen = (halfSpan + 0.1) / cosR + 0.15;      // inner end exactly at x = 0
+const panelCX = (panelLen / 2) * cosR;
+const panelCY = rafterCY - (panelCX - halfSpan / 2) * tanR + rafterT / 2 + 0.03;
 [-1, 1].forEach((s) => {
-    gableRoof.box(rafterLen + 0.25, 0.05, proj + 0.7, s * (halfSpan / 2 + 0.05), rafterCY + 0.2, wallZ + proj / 2, 0, 0, -s * rafterAng);
+    gableRoof.box(panelLen, 0.05, proj + 0.7, s * panelCX, panelCY, wallZ + proj / 2, 0, 0, -s * rafterAng);
 });
-gableRoof.mesh(roofMetal, garageGroup);
+gableRoof.mesh(roofMetal, porticoGroup);
 
 // ============ RIGHT WALL (+X) — deck side ============
 buildSideWall(HALF_W);
@@ -740,6 +888,12 @@ dw.box(0.08, JOIST_H, deckOut, -HALF_W + 0.04, 0, backMidZ);
 for (let x = -HALF_W + 0.3; x < HALF_W - 0.1; x += 0.41) {
     dw.box(0.06, JOIST_H, deckOut - 0.16, x, 0, backMidZ);
 }
+// Composite decking over the framing
+const BOARD_T = 0.03;
+const sideDeckD = HALF_D - deckZ1;
+const backDeckW = deckX0 + HALF_W;
+slab(deckBoardMat(deckOut, sideDeckD, true), deckOut, BOARD_T, sideDeckD, sideMidX, deckTop + BOARD_T / 2, sideMidZ, deckGroup);
+slab(deckBoardMat(backDeckW, deckOut, false), backDeckW, BOARD_T, deckOut, (deckX0 - HALF_W) / 2, deckTop + BOARD_T / 2, backMidZ, deckGroup);
 // Drop beams
 dw.box(0.18, 0.24, HALF_D - deckZ1 - 0.3, deckX1 - 0.3, -0.25, sideMidZ - 0.15);
 dw.box(deckX1 + HALF_W - 0.3, 0.24, 0.18, (deckX1 - HALF_W) / 2 - 0.15, -0.25, deckZ1 + 0.3);
@@ -835,7 +989,7 @@ railRun(-HALF_W + 0.3, backMidZ, -HALF_W + 0.3, deckZ0 - 0.15);
 
 // --- Landing off the deck edge, on two posts ---
 dw.box(landingOut, JOIST_H, landingW, landingCX, 0, landingZ);
-dm.box(landingOut - 0.04, 0.03, landingW - 0.04, landingCX, deckTop + 0.015, landingZ);
+slab(deckBoardMat(landingOut, landingW, true), landingOut, BOARD_T, landingW, landingCX, deckTop + BOARD_T / 2, landingZ, deckGroup);
 const landingPostX = deckX1 + landingOut - 0.1;
 groundPost(landingPostX, landingZ0 + 0.1);
 groundPost(landingPostX, landingZ1 - 0.1);
@@ -1029,7 +1183,8 @@ function registerClickRegion(root, link, labelText, labelLocalPos) {
     return root;
 }
 
-registerClickRegion(garageGroup, "New-Construction.html", "New Construction", new THREE.Vector3(0, ridgeY + 0.7, outerZ + 0.3));
+registerClickRegion(garageGroup, "New-Construction.html", "New Construction", new THREE.Vector3(0, doorH * 0.55, doorZ + 0.4));
+registerClickRegion(porticoGroup, "timber-framing.html", "Timber Framing", new THREE.Vector3(0, ridgeY + 0.7, outerZ + 0.3));
 registerClickRegion(deckGroup, "deck-building.html", "Deck Building", new THREE.Vector3(deckX1 - 0.6, 1.9, 0.9));
 registerClickRegion(treeGroup, "tree-trimming.html", "Tree Service", new THREE.Vector3(0, 5.9, 0));
 registerClickRegion(slidingDoorGroup, "interior-design.html", "Interior Design", new THREE.Vector3(0, 1.3, 0.5));
@@ -1116,8 +1271,27 @@ function onPointerMove(event) {
     pointerDirty = true; // raycast once per frame, not per event
 }
 
+// A "tap" is a press that doesn't move much or last long; a drag orbits the camera instead.
+const TAP_MAX_MOVE = 10;
+const TAP_MAX_MS = 500;
+let pressStart = null;
+
 function onPointerDown(event) {
-    if (event.target && event.target.closest && event.target.closest(".header a")) {
+    if (event.button !== undefined && event.button !== 0) {
+        pressStart = null;
+        return;
+    }
+    pressStart = { x: event.clientX, y: event.clientY, t: performance.now(), id: event.pointerId };
+}
+
+function onPointerUp(event) {
+    if (!pressStart || pressStart.id !== event.pointerId) {
+        return;
+    }
+    const moved = Math.hypot(event.clientX - pressStart.x, event.clientY - pressStart.y);
+    const held = performance.now() - pressStart.t;
+    pressStart = null;
+    if (moved > TAP_MAX_MOVE || held > TAP_MAX_MS) {
         return;
     }
     setPointerFromEvent(event);
@@ -1129,6 +1303,8 @@ function onPointerDown(event) {
 
 renderer.domElement.addEventListener("pointermove", onPointerMove);
 renderer.domElement.addEventListener("pointerdown", onPointerDown);
+renderer.domElement.addEventListener("pointerup", onPointerUp);
+renderer.domElement.addEventListener("pointercancel", () => { pressStart = null; });
 
 function animate() {
     requestAnimationFrame(animate);
@@ -1149,9 +1325,12 @@ function animate() {
 }
 animate();
 
-window.addEventListener("resize", () => {
+function onResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
+    camera.fov = fitCameraFov();
     camera.updateProjectionMatrix();
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO));
     renderer.setSize(window.innerWidth, window.innerHeight);
-});
+}
+window.addEventListener("resize", onResize);
+window.addEventListener("orientationchange", () => setTimeout(onResize, 120));

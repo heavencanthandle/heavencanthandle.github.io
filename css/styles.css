@@ -17,10 +17,28 @@ canvas {
     display: block;
 }
 
+html, body {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+
 #container {
     width: 100%;
     height: 100vh;
+    height: 100dvh;
     position: relative;
+}
+
+#container canvas {
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.menu-toggle {
+    display: none;
 }
 
 .header {
@@ -95,10 +113,73 @@ canvas {
     color: var(--muted);
 }
 
-@media (max-width: 700px) {
+@media (max-width: 700px), (max-height: 520px) {
     .header {
-        left: 12px;
-        top: 12px;
-        max-width: calc(100vw - 24px);
+        left: 10px;
+        top: calc(10px + env(safe-area-inset-top));
+        right: 10px;
+        max-width: none;
+        padding: 10px 12px;
+        border-radius: 14px;
+    }
+
+    .brand-row {
+        margin-bottom: 0;
+        gap: 10px;
+    }
+
+    .logo {
+        width: 34px;
+        height: 34px;
+    }
+
+    .title {
+        font-size: 1.05rem;
+        flex: 1;
+    }
+
+    .menu-toggle {
+        display: inline-block;
+        color: var(--text);
+        background: rgba(210, 167, 106, 0.18);
+        border: 1px solid rgba(232, 210, 173, 0.3);
+        border-radius: 999px;
+        padding: 8px 12px;
+        font: inherit;
+        font-size: 0.82rem;
+        line-height: 1;
+    }
+
+    .menu-toggle::after {
+        content: " \25BE";
+        font-size: 0.7em;
+    }
+
+    .header.is-open .menu-toggle::after {
+        content: " \25B4";
+    }
+
+    .subtitle,
+    .nav-menu,
+    .interaction-tip {
+        display: none;
+    }
+
+    .header.is-open .subtitle {
+        display: block;
+        margin: 10px 0 10px;
+    }
+
+    .header.is-open .nav-menu {
+        display: flex;
+    }
+
+    .header.is-open .interaction-tip {
+        display: block;
+    }
+
+    .nav-menu a {
+        padding: 10px 12px;
+        font-size: 0.88rem;
     }
 }
