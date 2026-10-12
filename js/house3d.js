@@ -619,10 +619,11 @@ const roofAngle = Math.atan2(roofRise, D);
 
 // Deck: full +X side, wrapping around the back (-Z)
 const deckOut = 3.0;
+const backDeckOut = deckOut;
 const deckX0 = HALF_W + WALL_T / 2;
 const deckX1 = deckX0 + deckOut;
 const deckZ0 = -HALF_D - WALL_T / 2;
-const deckZ1 = deckZ0 - deckOut;
+const deckZ1 = deckZ0 - backDeckOut;
 
 // --- Site: flat pad, steep drive dropping off to -X, hill rising behind (-Z) ---
 const dirtMat = new THREE.MeshStandardMaterial({ color: 0x766a5a, roughness: 0.97, metalness: 0 });
@@ -653,19 +654,25 @@ scene.add(pad);
 
 const bankT = 12;
 const bankMat = new THREE.MeshStandardMaterial({ color: 0x6a5f50, roughness: 0.98 });
-const bank = new THREE.Mesh(new THREE.BoxGeometry(dropLen, bankT, 140), bankMat);
+// West bank stops at the front pad edge so it does not meet the front slope in a raised spur
+const westBankZ0 = -70;
+const westBankLen = padEdgeZ - westBankZ0;
+const bank = new THREE.Mesh(new THREE.BoxGeometry(dropLen, bankT, westBankLen), bankMat);
 bank.rotation.z = dropAngle;
 bank.position.set(
     padEdgeX - dropRun / 2 + (bankT / 2) * Math.sin(dropAngle),
     lowerGroundY / 2 - (bankT / 2) * Math.cos(dropAngle),
-    0
+    (padEdgeZ + westBankZ0) / 2
 );
 scene.add(bank);
 
-const frontBank = new THREE.Mesh(new THREE.BoxGeometry(140, bankT, frontLen), bankMat);
+// Front bank starts at the west pad edge so the two drops stay independent
+const frontBankX1 = 70;
+const frontBankLenX = frontBankX1 - padEdgeX;
+const frontBank = new THREE.Mesh(new THREE.BoxGeometry(frontBankLenX, bankT, frontLen), bankMat);
 frontBank.rotation.x = -frontAngle;
 frontBank.position.set(
-    0,
+    (padEdgeX + frontBankX1) / 2,
     lowerGroundY / 2 - (bankT / 2) * Math.cos(frontAngle),
     padEdgeZ + frontRun / 2 - (bankT / 2) * Math.sin(frontAngle)
 );
@@ -698,22 +705,9 @@ gravel.position.set((gravelX0 + gravelX1) / 2, 0.02, (gravelZ0 + padEdgeZ) / 2);
 gravel.receiveShadow = true;
 scene.add(gravel);
 
-const hillEmergeZ = deckZ1 - 1.6;
-const hillside = new THREE.Mesh(new THREE.BoxGeometry(70, 6, 32), dirtMat);
-hillside.rotation.x = 0.3;
-hillside.position.set(padEdgeX - 1 + 35, -1.6, hillEmergeZ - 4.97);
-hillside.receiveShadow = true;
-scene.add(hillside);
-
 function terrainY(x, z) {
-    if (z < hillEmergeZ && x > padEdgeX - 1) {
-        return (hillEmergeZ - z) * 0.31;
-    }
     const west = x < padEdgeX ? Math.max(lowerGroundY, -(padEdgeX - x) * dropSlope) : 0;
     const south = z > padEdgeZ ? Math.max(lowerGroundY, -(z - padEdgeZ) * frontSlope) : 0;
-    if (x < padEdgeX && z > padEdgeZ) {
-        return Math.max(west, south); // the two banks intersect in a spur at the corner
-    }
     return Math.min(west, south);
 }
 
@@ -859,11 +853,9 @@ const backFacade = new THREE.Group();
 backFacade.position.set(0, 0, -HALF_D - WALL_T / 2 - 0.02);
 backFacade.rotation.y = Math.PI;
 house.add(backFacade);
-addWindow(backFacade, 0.6, 0.6, -1.3, 4.45);
-addWindow(backFacade, 0.6, 0.6, -0.5, 4.45);
-addWindow(backFacade, 0.45, 1.1, 2.0, 4.4);
-addWindow(backFacade, 0.5, 0.45, -2.2, 1.9);
-addWindow(backFacade, 0.5, 0.45, 2.2, 1.9);
+addWindow(backFacade, 0.6, 0.6, 0.7, 4.45);
+addWindow(backFacade, 0.6, 0.6, 1.5, 4.45);
+addWindow(backFacade, 0.58, 0.9, 2.0, 4.4);
 
 // ============ LEFT WALL (-X) — garage with king-post timber gable ============
 const garageOpenW = 3.4;
@@ -930,28 +922,27 @@ const footings = new GeoBuilder();
 });
 tb.box(halfSpan * 2 + 0.3, tieH, 0.22, 0, tieY, outerZ - 0.08);
 tb.box(halfSpan * 2 + 0.3, 0.22, 0.16, 0, tieY, wallZ + 0.1);
-const kingH = gableRise - rafterT * 0.5;
-tb.box(0.18, kingH, 0.18, 0, tieY + tieH / 2 + kingH / 2, outerZ - 0.08);
-const strutFrom = new THREE.Vector2(0, tieY + tieH / 2 + 0.12);
-const strutTo = new THREE.Vector2(halfSpan * 0.5, tieY + tieH / 2 + gableRise * 0.5 - 0.1);
-const strutLen = strutFrom.distanceTo(strutTo) + 0.06;
-const strutAng = Math.atan2(strutTo.y - strutFrom.y, strutTo.x - strutFrom.x);
-[-1, 1].forEach((s) => {
-    tb.box(strutLen, 0.14, 0.14, s * (strutFrom.x + strutTo.x) / 2, (strutFrom.y + strutTo.y) / 2, outerZ - 0.08, 0, 0, s * strutAng);
-});
 const rafterCY = tieY + tieH / 2 + gableRise / 2 + 0.08;
 [wallZ + 0.12, outerZ - 0.08].forEach((z) => {
     [-1, 1].forEach((s) => {
         tb.box(rafterLen, rafterT, 0.16, s * halfSpan / 2, rafterCY, z, 0, 0, -s * rafterAng);
     });
 });
-const ridgeY = tieY + tieH / 2 + gableRise + 0.12;
-tb.box(0.16, 0.2, proj + 0.4, 0, ridgeY, wallZ + proj / 2);
-[0.33, 0.66].forEach((f) => {
-    [-1, 1].forEach((s) => {
-        tb.box(0.12, 0.12, proj + 0.4, s * halfSpan * f, tieY + tieH / 2 + gableRise * (1 - f) + 0.11, wallZ + proj / 2);
-    });
+// King post and struts land on the rafter undersides — no leftover gap, no wall-to-eave purlins
+const rafterYAt = (x) => rafterCY + (halfSpan / 2 - Math.abs(x)) * Math.tan(rafterAng);
+const rafterUnder = (x) => rafterYAt(x) - (rafterT / 2) / Math.cos(rafterAng);
+const kingBottom = tieY + tieH / 2;
+const kingTop = rafterUnder(0);
+const kingH = kingTop - kingBottom;
+tb.box(0.18, kingH, 0.18, 0, (kingTop + kingBottom) / 2, outerZ - 0.08);
+const strutFrom = new THREE.Vector2(0.09, kingBottom + 0.14);
+const strutTo = new THREE.Vector2(halfSpan * 0.58, rafterUnder(halfSpan * 0.58));
+const strutLen = strutFrom.distanceTo(strutTo);
+const strutAng = Math.atan2(strutTo.y - strutFrom.y, strutTo.x - strutFrom.x);
+[-1, 1].forEach((s) => {
+    tb.box(strutLen, 0.14, 0.14, s * (strutFrom.x + strutTo.x) / 2, (strutFrom.y + strutTo.y) / 2, outerZ - 0.08, 0, 0, s * strutAng);
 });
+const ridgeY = rafterYAt(0) + 0.15;
 tb.mesh(trussMat, porticoGroup);
 footings.mesh(concreteMat, porticoGroup);
 
@@ -977,9 +968,6 @@ sideFacade.rotation.y = Math.PI / 2; // local +x -> world -Z
 house.add(sideFacade);
 
 addWindow(sideFacade, 0.45, 1.25, -2.1, 4.8);
-addWindow(sideFacade, 0.45, 1.25, -1.5, 4.8);
-addWindow(sideFacade, 0.55, 0.55, -2.1, 1.95);
-addWindow(sideFacade, 0.5, 0.45, 0.2, 1.85);
 addWindow(sideFacade, 0.5, 0.45, 2.0, 1.85);
 
 const remodelWindowGroup = new THREE.Group();
@@ -1007,7 +995,7 @@ furniture.mesh(new THREE.MeshStandardMaterial({ color: 0x8a8f96, roughness: 0.85
 
 // ============ SHED ROOF (high at +Z, low at -Z) ============
 const ovFront = 1.2;
-const ovBack = 0.6;
+const ovBack = 0;
 const ovSide = 0.65;
 const roofLen = (D + ovFront + ovBack) / Math.cos(roofAngle);
 const roofW = W + ovSide * 2;
@@ -1022,7 +1010,7 @@ soffit.rotation.x = -roofAngle;
 
 const fascia = new GeoBuilder();
 fascia.box(roofW, 0.34, 0.06, 0, topFront + ovFront * slope - 0.03, HALF_D + ovFront + 0.03);
-fascia.box(roofW, 0.3, 0.06, 0, topBack - ovBack * slope - 0.03, -HALF_D - ovBack - 0.03);
+fascia.box(roofW, 0.14, 0.05, 0, topBack - 0.02, -HALF_D - 0.03);
 [-1, 1].forEach((s) => {
     fascia.box(0.06, 0.3, roofLen, s * (HALF_W + ovSide + 0.03), roofCY - 0.06, roofCZ, -roofAngle, 0, 0);
 });
@@ -1034,9 +1022,7 @@ const tailCount = 6;
 for (let i = 0; i < tailCount; i += 1) {
     const x = -HALF_W + 0.3 + ((W - 0.6) / (tailCount - 1)) * i;
     const tz = HALF_D + ovFront / 2 - 0.2;
-    tails.box(0.26, 0.5, ovFront + 0.7, x, topFront + (tz - HALF_D) * slope - 0.3, tz, -roofAngle, 0, 0);
-    const bz = -HALF_D - ovBack / 2 + 0.15;
-    tails.box(0.24, 0.42, ovBack + 0.6, x, topBack + (bz + HALF_D) * slope - 0.26, bz, -roofAngle, 0, 0);
+    tails.box(0.26, 0.5, ovFront + 0.15, x, topFront + (tz - HALF_D) * slope - 0.3, tz, -roofAngle, 0, 0);
 }
 tails.mesh(timberMat, house);
 
@@ -1070,40 +1056,44 @@ deckGroup.position.set(0, lowerTop + 0.1, 0);
 house.add(deckGroup);
 
 const JOIST_H = 0.26;
+const JOIST_SPACING = 0.41;
 const deckTop = JOIST_H / 2;                 // local y of the deck surface
 const groundLocal = -deckGroup.position.y;   // local y of grade
+const deckFrontZ = HALF_D + JOIST_SPACING * 2; // two bays past the front wall
+const backDeckX0 = 0;                         // back wing only covers the +X half
 const sideMidX = (deckX0 + deckX1) / 2;
-const sideMidZ = (HALF_D + deckZ1) / 2;
+const sideMidZ = (deckFrontZ + deckZ1) / 2;
+const backMidX = (backDeckX0 + deckX1) / 2;
 const backMidZ = (deckZ0 + deckZ1) / 2;
+const sideLen = deckFrontZ - deckZ1;
+const backDeckW = deckX1 - backDeckX0;
 
 const dw = new GeoBuilder();   // wood framing + posts + stringers
 const ds = new GeoBuilder();   // sonotubes
 const dm = new GeoBuilder();   // metal rails + treads
 const dwire = new GeoBuilder(); // hog-wire panels
 
-// Side wing (+X)
-dw.box(0.08, JOIST_H, D, deckX0 + 0.04, 0, 0);
-dw.box(0.08, JOIST_H, HALF_D - deckZ1, deckX1 - 0.04, 0, sideMidZ);
-dw.box(deckOut, JOIST_H, 0.08, sideMidX, 0, HALF_D - 0.04);
-for (let z = HALF_D - 0.3; z > deckZ1 + 0.15; z -= 0.41) {
+// Side wing (+X), now past the front wall
+dw.box(0.08, JOIST_H, HALF_D - deckZ0, deckX0 + 0.04, 0, (HALF_D + deckZ0) / 2);
+dw.box(0.08, JOIST_H, sideLen, deckX1 - 0.04, 0, sideMidZ);
+dw.box(deckOut, JOIST_H, 0.08, sideMidX, 0, deckFrontZ - 0.04);
+for (let z = deckFrontZ - 0.2; z > deckZ1 + 0.15; z -= JOIST_SPACING) {
     dw.box(deckOut - 0.16, JOIST_H, 0.06, sideMidX, 0, z);
 }
-// Back wing (-Z)
-dw.box(W, JOIST_H, 0.08, 0, 0, deckZ0 - 0.04);
-dw.box(deckX1 + HALF_W, JOIST_H, 0.08, (deckX1 - HALF_W) / 2, 0, deckZ1 + 0.04);
-dw.box(0.08, JOIST_H, deckOut, -HALF_W + 0.04, 0, backMidZ);
-for (let x = -HALF_W + 0.3; x < HALF_W - 0.1; x += 0.41) {
-    dw.box(0.06, JOIST_H, deckOut - 0.16, x, 0, backMidZ);
+// Back wing (-Z), only the +X half of the house and a short cantilever off the wall
+dw.box(backDeckW, JOIST_H, 0.08, backMidX, 0, deckZ0 - 0.04);
+dw.box(backDeckW, JOIST_H, 0.08, backMidX, 0, deckZ1 + 0.04);
+dw.box(0.08, JOIST_H, backDeckOut, backDeckX0 + 0.04, 0, backMidZ);
+for (let x = backDeckX0 + 0.3; x < deckX1 - 0.1; x += JOIST_SPACING) {
+    dw.box(0.06, JOIST_H, backDeckOut - 0.16, x, 0, backMidZ);
 }
 // Composite decking over the framing
 const BOARD_T = 0.03;
-const sideDeckD = HALF_D - deckZ1;
-const backDeckW = deckX0 + HALF_W;
-slab(deckBoardMat(deckOut, sideDeckD, true), deckOut, BOARD_T, sideDeckD, sideMidX, deckTop + BOARD_T / 2, sideMidZ, deckGroup);
-slab(deckBoardMat(backDeckW, deckOut, false), backDeckW, BOARD_T, deckOut, (deckX0 - HALF_W) / 2, deckTop + BOARD_T / 2, backMidZ, deckGroup);
+slab(deckBoardMat(deckOut, sideLen, true), deckOut, BOARD_T, sideLen, sideMidX, deckTop + BOARD_T / 2, sideMidZ, deckGroup);
+slab(deckBoardMat(backDeckW, backDeckOut, false), backDeckW, BOARD_T, backDeckOut, backMidX, deckTop + BOARD_T / 2, backMidZ, deckGroup);
 // Drop beams
-dw.box(0.18, 0.24, HALF_D - deckZ1 - 0.3, deckX1 - 0.3, -0.25, sideMidZ - 0.15);
-dw.box(deckX1 + HALF_W - 0.3, 0.24, 0.18, (deckX1 - HALF_W) / 2 - 0.15, -0.25, deckZ1 + 0.3);
+dw.box(0.18, 0.24, sideLen - 0.3, deckX1 - 0.3, -0.25, sideMidZ - 0.15);
+dw.box(backDeckW - 0.3, 0.24, 0.18, backMidX - 0.1, -0.25, deckZ1 + 0.3);
 
 function groundPost(x, z, topLocal = 1.15) {
     const bottom = groundLocal + 0.55;
@@ -1125,21 +1115,24 @@ const landingCX = deckX1 + landingOut / 2;
 
 const sidePostX = deckX1 - 0.3;
 const backPostZ = deckZ1 + 0.3;
-const sidePostZs = [HALF_D - 0.3, 0.6, landingZ1, landingZ0, -4.2, backPostZ];
+// Last ground post sits at the front wall; the two bays past that cantilever
+const sidePostZs = [HALF_D - 0.15, 0.6, landingZ1, landingZ0, backPostZ];
 sidePostZs.forEach((z) => groundPost(sidePostX, z));
+railPost(sidePostX, deckFrontZ - 0.25);
 
 const backPostXs = [];
-const backSpan = sidePostX - (-HALF_W + 0.3);
-const backBays = Math.round(backSpan / 1.65);
+const backSpan = sidePostX - (backDeckX0 + 0.3);
+const backBays = Math.max(1, Math.round(backSpan / 1.65));
 for (let i = 0; i < backBays; i += 1) {
-    backPostXs.push(-HALF_W + 0.3 + (backSpan / backBays) * i);
+    backPostXs.push(backDeckX0 + 0.3 + (backSpan / backBays) * i);
 }
 backPostXs.forEach((x) => groundPost(x, backPostZ));
 
-// Back deck rail is carried by the ground posts alone (no mid-bay posts)
-railPost(-HALF_W + 0.3, backMidZ);
-railPost(-HALF_W + 0.3, deckZ0 - 0.15);
-railPost(deckX0 + 0.12, HALF_D - 0.15);
+// Rails at the cut end of the back wing and the new front extension
+railPost(backDeckX0 + 0.3, backMidZ);
+railPost(backDeckX0 + 0.3, deckZ0 - 0.15);
+railPost(deckX0 + 0.12, deckFrontZ - 0.15);
+railPost(deckX0 + 0.12, HALF_D + 0.08);
 
 // Metal rail + hog-wire panel between two post centres (same base height)
 const RAIL_TOP = 1.0;
@@ -1179,16 +1172,18 @@ for (let i = 0; i < sidePostZs.length - 1; i += 1) {
     }
     railRun(sidePostX, z0, sidePostX, z1);
 }
-// Front end of the side wing
-railRun(deckX0 + 0.12, HALF_D - 0.15, sidePostX, HALF_D - 0.3);
+railRun(sidePostX, HALF_D - 0.15, sidePostX, deckFrontZ - 0.25);
+// Front end of the side wing (past the house) and the inner edge of that extension
+railRun(deckX0 + 0.12, HALF_D + 0.08, deckX0 + 0.12, deckFrontZ - 0.15);
+railRun(deckX0 + 0.12, deckFrontZ - 0.15, sidePostX, deckFrontZ - 0.25);
 // Back outer edge
 for (let i = 0; i < backPostXs.length; i += 1) {
     const nextX = i + 1 < backPostXs.length ? backPostXs[i + 1] : sidePostX;
     railRun(backPostXs[i], backPostZ, nextX, backPostZ);
 }
-// -X end of the back wing
-railRun(-HALF_W + 0.3, backPostZ, -HALF_W + 0.3, backMidZ);
-railRun(-HALF_W + 0.3, backMidZ, -HALF_W + 0.3, deckZ0 - 0.15);
+// Cut end of the back wing (halfway across the house)
+railRun(backDeckX0 + 0.3, backPostZ, backDeckX0 + 0.3, backMidZ);
+railRun(backDeckX0 + 0.3, backMidZ, backDeckX0 + 0.3, deckZ0 - 0.15);
 
 // --- Landing off the deck edge, on two posts ---
 dw.box(landingOut, JOIST_H, landingW, landingCX, 0, landingZ);
@@ -1253,6 +1248,67 @@ dm.mesh(railMetalMat, deckGroup);
 dwire.mesh(hogWireMat, deckGroup, false);
 slab(concreteMat, stairW + 0.4, 0.08, 0.9, stairCX, groundLocal + 0.04, stairZ1 + 0.4, deckGroup);
 
+// --- Back gutter, rain tank on the remaining back deck, BBQ in front of the tank ---
+const gutterMat = new THREE.MeshStandardMaterial({ color: 0x6a6f74, roughness: 0.42, metalness: 0.72 });
+const tankMat = new THREE.MeshStandardMaterial({ color: 0x2c353b, roughness: 0.62, metalness: 0.12 });
+const grillMat = new THREE.MeshStandardMaterial({ color: 0x1c1c1e, roughness: 0.48, metalness: 0.45 });
+const grillAccent = new THREE.MeshStandardMaterial({ color: 0xb08a3a, roughness: 0.45, metalness: 0.55 });
+
+const gutterY = topBack - ovBack * slope - 0.2;
+const gutterZ = -HALF_D - ovBack - 0.08;
+slab(gutterMat, W + 0.4, 0.09, 0.12, 0, gutterY, gutterZ);
+
+const tankX = 1.7;
+const tankH = 1.28;
+const tankR = 0.52;
+const tankLocalY = deckTop + 0.06 + tankH / 2;
+const tankZ = deckZ0 - 0.58;
+slab(woodMat, 1.16, 0.08, 1.16, tankX, deckTop + 0.07, tankZ, deckGroup);
+const tank = new THREE.Mesh(new THREE.CylinderGeometry(tankR - 0.03, tankR, tankH, 16), tankMat);
+tank.position.set(tankX, tankLocalY, tankZ);
+tank.castShadow = true;
+tank.receiveShadow = true;
+deckGroup.add(tank);
+slab(tankMat, tankR * 2.05, 0.06, tankR * 2.05, tankX, tankLocalY + tankH / 2 + 0.03, tankZ, deckGroup);
+const tankBand = new THREE.Mesh(new THREE.TorusGeometry(tankR - 0.02, 0.03, 8, 18), gutterMat);
+tankBand.rotation.x = Math.PI / 2;
+tankBand.position.set(tankX, tankLocalY, tankZ);
+deckGroup.add(tankBand);
+
+const tankTopWorld = deckGroup.position.y + tankLocalY + tankH / 2 + 0.05;
+const dropH = gutterY - tankTopWorld;
+slab(gutterMat, 0.07, dropH, 0.07, tankX, gutterY - dropH / 2, gutterZ);
+slab(gutterMat, 0.07, 0.07, Math.abs(tankZ - gutterZ) + 0.04, tankX, tankTopWorld, (tankZ + gutterZ) / 2);
+
+// Cart grill between the barrel and the hangout, front facing the side deck (+X)
+const grillGroup = new THREE.Group();
+grillGroup.position.set(tankX + 1.35, 0, tankZ - 0.58);
+grillGroup.rotation.y = Math.PI / 2;
+deckGroup.add(grillGroup);
+const gb = new GeoBuilder();
+const gs = new GeoBuilder();
+gb.box(1.25, 0.55, 0.72, 0, deckTop + 0.62, 0);
+gb.box(1.28, 0.08, 0.76, 0, deckTop + 0.94, 0);
+gb.box(1.22, 0.04, 0.68, 0, deckTop + 0.9, 0.02);
+gb.box(0.08, 0.22, 0.08, -0.48, deckTop + 1.08, 0.28);
+gb.box(0.08, 0.22, 0.08, 0, deckTop + 1.08, 0.28);
+gb.box(0.08, 0.22, 0.08, 0.48, deckTop + 1.08, 0.28);
+[-1, 1].forEach((sx) => {
+    [-1, 1].forEach((sz) => {
+        gb.box(0.07, 0.38, 0.07, sx * 0.52, deckTop + 0.19, sz * 0.28);
+    });
+});
+gb.box(0.55, 0.06, 0.5, 0.95, deckTop + 0.92, 0);
+gb.mesh(grillMat, grillGroup);
+gs.box(0.55, 0.12, 0.04, 0, deckTop + 0.98, 0.4);
+gs.box(0.06, 0.06, 0.18, -0.48, deckTop + 1.2, 0.36);
+gs.box(0.06, 0.06, 0.18, 0, deckTop + 1.2, 0.36);
+gs.box(0.06, 0.06, 0.18, 0.48, deckTop + 1.2, 0.36);
+gs.mesh(grillAccent, grillGroup);
+const tankSmall = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.38, 10), grillMat);
+tankSmall.position.set(-0.82, deckTop + 0.32, -0.12);
+grillGroup.add(tankSmall);
+
 // ============ FOREST (instanced) ============
 const foliageMat = new THREE.MeshStandardMaterial({ color: 0x2f5c38, roughness: 0.92 });
 const foliageDark = new THREE.MeshStandardMaterial({ color: 0x27492f, roughness: 0.92 });
@@ -1297,7 +1353,10 @@ for (let i = forestSpots.length - 1; i >= 0; i -= 1) {
 
 const trunkGeo = new THREE.CylinderGeometry(0.14, 0.22, 2.6, 7);
 const coneGeo = new THREE.ConeGeometry(1, 1.5, 7);
-const trunks = new THREE.InstancedMesh(trunkGeo, woodMat, forestSpots.length);
+const forestTrunkMat = woodMat.clone();
+const forestGroup = new THREE.Group();
+scene.add(forestGroup);
+const trunks = new THREE.InstancedMesh(trunkGeo, forestTrunkMat, forestSpots.length);
 const conesA = new THREE.InstancedMesh(coneGeo, foliageMat, forestSpots.length * 2);
 const conesB = new THREE.InstancedMesh(coneGeo, foliageDark, forestSpots.length * 2);
 const im = new THREE.Matrix4();
@@ -1315,7 +1374,7 @@ forestSpots.forEach(([x, z, s], i) => {
 [trunks, conesA, conesB].forEach((inst) => {
     inst.instanceMatrix.needsUpdate = true;
     inst.castShadow = true;
-    scene.add(inst);
+    forestGroup.add(inst);
 });
 
 // Clickable foreground tree (regular meshes so it can be a region)
@@ -1408,6 +1467,7 @@ function registerClickRegion(root, link, labelText, labelLocalPos) {
 registerClickRegion(garageGroup, "New-Construction.html", "New Construction", new THREE.Vector3(0, doorH * 0.55, doorZ + 0.4));
 registerClickRegion(porticoGroup, "timber-framing.html", "Timber Framing", new THREE.Vector3(0, ridgeY + 0.7, outerZ + 0.3));
 registerClickRegion(deckGroup, "deck-building.html", "Deck Building", new THREE.Vector3(deckX1 - 0.6, 1.9, 0.9));
+registerClickRegion(forestGroup, "tree-trimming.html", null, new THREE.Vector3());
 registerClickRegion(treeGroup, "tree-trimming.html", "Tree Service", new THREE.Vector3(0, 5.9, 0));
 registerClickRegion(slidingDoorGroup, "interior-design.html", "Interior Design", new THREE.Vector3(0, 1.3, 0.5));
 registerClickRegion(serviceDoorGroup, "handyman.html", "Handyman", new THREE.Vector3(0, sdOpenH + 0.5, 0.5));
