@@ -1,170 +1,117 @@
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0e141c);
-scene.fog = new THREE.Fog(0x0e141c, 12, 28);
+scene.background = new THREE.Color(0x87a8c4);
+scene.fog = new THREE.Fog(0x9eb5c9, 24, 64);
 
-const camera = new THREE.PerspectiveCamera(64, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(8, 6.2, 9.2);
-camera.lookAt(0, 1.35, 0);
+const camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.1, 120);
+camera.position.set(12, 7, 13);
+camera.lookAt(0, 2.3, 0);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.getElementById("container").appendChild(renderer.domElement);
 
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-controls.dampingFactor = 0.07;
-controls.target.set(0, 1.3, 0);
-controls.maxPolarAngle = Math.PI / 2.05;
-controls.minDistance = 5.2;
-controls.maxDistance = 16.5;
-
+controls.target.set(0, 2.2, 0);
+controls.maxPolarAngle = Math.PI / 2.02;
+controls.minDistance = 7;
+controls.maxDistance = 26;
 controls.autoRotate = true;
-controls.autoRotateSpeed = 0.22;
-const baseTargetY = controls.target.y;
-let isUserInteracting = false;
-controls.addEventListener("start", () => {
-    isUserInteracting = true;
-    controls.autoRotate = false;
-});
-controls.addEventListener("end", () => {
-    isUserInteracting = false;
-    controls.autoRotate = true;
-});
+controls.autoRotateSpeed = 0.18;
 
-scene.add(new THREE.HemisphereLight(0xdce8f5, 0x2a2418, 0.55));
-scene.add(new THREE.AmbientLight(0xefe6d8, 0.38));
+const cedarMat = new THREE.MeshStandardMaterial({ color: 0xb58f63, roughness: 0.82 });
+const purpleMat = cedarMat; // upper storey is finished in cedar now
+const corrMat = new THREE.MeshStandardMaterial({ color: 0x34393f, roughness: 0.55, metalness: 0.35 });
+const roofMat = new THREE.MeshStandardMaterial({ color: 0x1c1d20, roughness: 0.35, metalness: 0.55 });
+const trimMat = new THREE.MeshStandardMaterial({ color: 0xf2f2ee, roughness: 0.55 });
+const woodMat = new THREE.MeshStandardMaterial({ color: 0x8b6840, roughness: 0.78 });
+const glassMat = new THREE.MeshStandardMaterial({ color: 0xa8bdd0, transparent: true, opacity: 0.55, emissive: 0x223040, emissiveIntensity: 0.18 });
 
-const keyLight = new THREE.DirectionalLight(0xfff0d4, 1.0);
-keyLight.position.set(8, 10, 6);
-keyLight.castShadow = true;
-keyLight.shadow.mapSize.set(512, 512);
-scene.add(keyLight);
+scene.add(new THREE.HemisphereLight(0xe8f2ff, 0x3d4a32, 0.65));
+scene.add(new THREE.DirectionalLight(0xfff6e8, 1.0).translateX(12).translateY(16).translateZ(8));
 
-const lawn = new THREE.Mesh(
-    new THREE.CircleGeometry(20, 32),
-    new THREE.MeshStandardMaterial({ color: 0x2d4a32, roughness: 0.92 })
-);
-lawn.rotation.x = -Math.PI / 2;
-lawn.receiveShadow = true;
-scene.add(lawn);
-
-const sidingMat = new THREE.MeshStandardMaterial({ color: 0xa39d94, roughness: 0.78 });
-const roofMat = new THREE.MeshStandardMaterial({ color: 0x2a2826, roughness: 0.88, metalness: 0.1 });
-const woodMat = new THREE.MeshStandardMaterial({ color: 0x6b4528, roughness: 0.72 });
-const trimMat = new THREE.MeshStandardMaterial({ color: 0xd4c4a8, roughness: 0.65 });
-const glassMat = new THREE.MeshStandardMaterial({
-    color: 0x9eb4c8,
-    roughness: 0.1,
-    metalness: 0.3,
-    transparent: true,
-    opacity: 0.75,
-    emissive: 0x1a2838,
-    emissiveIntensity: 0.2
-});
+const hill = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshStandardMaterial({ color: 0x8a7f6e, roughness: 0.96 }));
+hill.rotation.x = -Math.PI / 2;
+hill.rotation.z = 0.1;
+scene.add(hill);
 
 const house = new THREE.Group();
 scene.add(house);
 
-const foundation = new THREE.Mesh(new THREE.BoxGeometry(5.35, 0.28, 4.85), new THREE.MeshStandardMaterial({ color: 0x5c5a56, roughness: 0.95 }));
-foundation.position.y = 0.14;
-foundation.castShadow = true;
-house.add(foundation);
+const W = 7.4;
+const D = 4.85;
+const HALF_W = W / 2;
+const HALF_D = D / 2;
+const FLOOR_H = 1.38;
+const BASE_H = 0.52;
 
-// Left exterior wall omitted (matches desktop) for interior visibility.
-const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.16, 2.85, 4.55), sidingMat);
-rightWall.position.set(2.58, 1.72, 0);
-rightWall.castShadow = true;
-house.add(rightWall);
-
-const backWall = new THREE.Mesh(new THREE.BoxGeometry(5.15, 2.85, 0.16), sidingMat);
-backWall.position.set(0, 1.72, -2.28);
-backWall.castShadow = true;
-house.add(backWall);
-
-const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry(1.95, 2.85, 0.16), sidingMat);
-frontWallLeft.position.set(-1.62, 1.72, 2.28);
-frontWallLeft.castShadow = true;
-house.add(frontWallLeft);
-
-const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry(1.95, 2.85, 0.16), sidingMat);
-frontWallRight.position.set(1.62, 1.72, 2.28);
-frontWallRight.castShadow = true;
-house.add(frontWallRight);
-
-const trimBand = new THREE.Mesh(new THREE.BoxGeometry(5.38, 0.14, 4.78), trimMat);
-trimBand.position.y = 3.12;
-house.add(trimBand);
-
-const roof = new THREE.Mesh(new THREE.ConeGeometry(4.35, 1.65, 4), roofMat);
-roof.position.y = 3.95;
-roof.rotation.y = Math.PI / 4;
-roof.castShadow = true;
-house.add(roof);
-
-const doorGroup = new THREE.Group();
-house.add(doorGroup);
-const door = new THREE.Mesh(new THREE.BoxGeometry(0.88, 1.75, 0.12), woodMat);
-door.position.set(0, 1.18, 2.34);
-door.castShadow = true;
-doorGroup.add(door);
-
-const doorFrame = new THREE.Mesh(new THREE.BoxGeometry(1.05, 1.95, 0.06), trimMat);
-doorFrame.position.set(0, 1.22, 2.26);
-house.add(doorFrame);
-
-function buildWindow(x, link) {
-    const group = new THREE.Group();
-    group.position.set(x, 1.85, 2.28);
-    const frame = new THREE.Mesh(new THREE.BoxGeometry(1.05, 1.02, 0.1), trimMat);
-    group.add(frame);
-    const glass = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.78, 0.05), glassMat.clone());
-    glass.position.z = 0.04;
-    group.add(glass);
-    house.add(group);
-    return group;
+function box(w, h, d, mat, x, y, z, parent = house) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    m.position.set(x, y, z);
+    m.castShadow = true;
+    parent.add(m);
+    return m;
 }
 
-const interiorWindowGroup = buildWindow(-1.68, "interior-design.html");
-const remodelWindowGroup = buildWindow(1.68, "Remodels.html");
+box(W + 0.2, BASE_H, D + 0.2, corrMat, 0, BASE_H / 2, 0);
+box(0.16, FLOOR_H * 2, D, purpleMat, HALF_W, BASE_H + FLOOR_H, 0);
+box(W, FLOOR_H * 2, 0.16, cedarMat, 0, BASE_H + FLOOR_H, -HALF_D);
+box(W * 0.42, FLOOR_H, 0.16, cedarMat, -HALF_W + W * 0.21, BASE_H + FLOOR_H / 2, HALF_D);
+box(W * 0.22, FLOOR_H, 0.16, cedarMat, HALF_W - W * 0.11, BASE_H + FLOOR_H / 2, HALF_D);
+box(W * 0.46, FLOOR_H, 0.16, cedarMat, -HALF_W + W * 0.23, BASE_H + FLOOR_H * 1.5, HALF_D);
+box(W * 0.48, FLOOR_H, 0.16, purpleMat, HALF_W - W * 0.24, BASE_H + FLOOR_H * 1.5, HALF_D);
+
+const garageGroup = new THREE.Group();
+garageGroup.position.set(0, BASE_H + FLOOR_H / 2, HALF_D);
+house.add(garageGroup);
+box(3.15, 2.05, 0.14, new THREE.MeshStandardMaterial({ color: 0x2a2520 }), 0, 0, 0, garageGroup);
+
+const serviceDoorGroup = new THREE.Group();
+serviceDoorGroup.position.set(HALF_W - 0.55, BASE_H + 0.62, HALF_D + 0.02);
+house.add(serviceDoorGroup);
+box(0.82, 1.72, 0.1, new THREE.MeshStandardMaterial({ color: 0x4a4038 }), 0, 0.86, 0, serviceDoorGroup);
+
+const slidingDoorGroup = new THREE.Group();
+slidingDoorGroup.position.set(1.55, BASE_H + FLOOR_H * 1.5, HALF_D + 0.05);
+house.add(slidingDoorGroup);
+box(1.35, 1.05, 0.08, trimMat, 0, 0, 0, slidingDoorGroup);
+box(1.18, 0.92, 0.05, glassMat, 0, 0, 0.04, slidingDoorGroup);
+
+const remodelWindowGroup = new THREE.Group();
+remodelWindowGroup.position.set(0.35, BASE_H + FLOOR_H * 1.5, HALF_D + 0.05);
+house.add(remodelWindowGroup);
+box(0.84, 0.84, 0.08, trimMat, 0, 0, 0, remodelWindowGroup);
+
+const roofRise = 1.05;
+const eaveHigh = BASE_H + FLOOR_H * 2 + 0.15;
+const eaveLow = eaveHigh - roofRise;
+const roof = new THREE.Mesh(new THREE.BoxGeometry(W + 1.1, 0.11, D + 1.05), roofMat);
+roof.rotation.z = -Math.atan2(roofRise, W);
+roof.position.set(0, (eaveHigh + eaveLow) / 2 + 0.08, 0);
+house.add(roof);
 
 const deckGroup = new THREE.Group();
-deckGroup.position.set(3.65, 0, 0.2);
+deckGroup.position.set(HALF_W + 0.05, BASE_H + FLOOR_H + 0.08, 0.15);
 house.add(deckGroup);
-
-const deck = new THREE.Mesh(new THREE.BoxGeometry(2.15, 0.16, 3.5), woodMat);
-deck.position.set(0, 1.02, 0);
-deck.castShadow = true;
-deckGroup.add(deck);
-
-const deckRail = new THREE.Mesh(new THREE.BoxGeometry(2.15, 0.48, 0.08), new THREE.MeshStandardMaterial({ color: 0x8a7d6a, metalness: 0.5, roughness: 0.45 }));
-deckRail.position.set(0, 1.32, -1.58);
-deckGroup.add(deckRail);
+box(3.05, 0.14, 2.35, woodMat, 1.38, 0, 0, deckGroup);
+box(0.14, 2.55, 0.14, woodMat, 2.85, -1.25, 0.9, deckGroup);
+box(0.32, 0.55, 0.32, corrMat, 2.85, -2.55, 0.9, deckGroup);
 
 const treeGroup = new THREE.Group();
-treeGroup.position.set(-4.85, 0, -1.35);
+treeGroup.position.set(-6.5, 0, 4);
 scene.add(treeGroup);
-
-const treeTrunk = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.26, 2.05, 10), woodMat);
-treeTrunk.position.y = 1.02;
-treeTrunk.castShadow = true;
-treeGroup.add(treeTrunk);
-
-const treeTop = new THREE.Mesh(
-    new THREE.SphereGeometry(1.2, 14, 14),
-    new THREE.MeshStandardMaterial({ color: 0x2f6b38, roughness: 0.88 })
-);
-treeTop.position.y = 2.65;
-treeTop.castShadow = true;
-treeGroup.add(treeTop);
+const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.22, 2.2, 10), woodMat);
+trunk.position.y = 1.1;
+treeGroup.add(trunk);
+const top = new THREE.Mesh(new THREE.ConeGeometry(1.05, 2.2, 10), new THREE.MeshStandardMaterial({ color: 0x2f5c38 }));
+top.position.y = 2.65;
+treeGroup.add(top);
 
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 let hoveredRegion = null;
-
-/** @type {{ root: THREE.Object3D, meshes: THREE.Mesh[], link: string }[]} */
 const clickRegions = [];
 
 function registerClickRegion(root, link) {
@@ -179,40 +126,14 @@ function registerClickRegion(root, link) {
     clickRegions.push({ root, meshes, link });
 }
 
-registerClickRegion(doorGroup, "handyman.html");
+registerClickRegion(garageGroup, "New-Construction.html");
 registerClickRegion(deckGroup, "deck-building.html");
 registerClickRegion(treeGroup, "tree-trimming.html");
-registerClickRegion(interiorWindowGroup, "interior-design.html");
+registerClickRegion(slidingDoorGroup, "interior-design.html");
+registerClickRegion(serviceDoorGroup, "handyman.html");
 registerClickRegion(remodelWindowGroup, "Remodels.html");
 
-const pickables = clickRegions.flatMap((region) => region.meshes);
-
-function setRegionHighlight(region, active) {
-    if (!region) {
-        return;
-    }
-    region.meshes.forEach((mesh) => {
-        const mat = mesh.material;
-        if (!mat || !mat.emissive) {
-            return;
-        }
-        if (active) {
-            mat.emissive.setHex(0xc9a066);
-            mat.emissiveIntensity = 0.25;
-        } else {
-            mat.emissive.setHex(0x000000);
-            mat.emissiveIntensity = mat.userData.baseEmissiveIntensity ?? 0;
-        }
-    });
-}
-
-clickRegions.forEach((region) => {
-    region.meshes.forEach((mesh) => {
-        if (mesh.material && mesh.material.emissive) {
-            mesh.material.userData.baseEmissiveIntensity = mesh.material.emissiveIntensity || 0;
-        }
-    });
-});
+const pickables = clickRegions.flatMap((r) => r.meshes);
 
 function setPointerFromEvent(event) {
     const rect = renderer.domElement.getBoundingClientRect();
@@ -220,50 +141,21 @@ function setPointerFromEvent(event) {
     pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 }
 
-function regionFromObject(obj) {
-    if (!obj || !obj.userData.regionRoot) {
-        return null;
-    }
-    return clickRegions.find((r) => r.root === obj.userData.regionRoot) || null;
-}
-
 function onTouchStart(event) {
     const touch = event.touches[0];
-    if (!touch) {
-        return;
-    }
+    if (!touch) return;
     setPointerFromEvent(touch);
     raycaster.setFromCamera(pointer, camera);
     const hits = raycaster.intersectObjects(pickables);
-    if (hits.length && hits[0].object.userData && hits[0].object.userData.link) {
+    if (hits.length && hits[0].object.userData.link) {
         window.location.href = hits[0].object.userData.link;
     }
 }
 
-function onTouchMove(event) {
-    const touch = event.touches[0];
-    if (!touch) {
-        return;
-    }
-    setPointerFromEvent(touch);
-    raycaster.setFromCamera(pointer, camera);
-    const hits = raycaster.intersectObjects(pickables);
-    const hitObj = hits.length ? hits[0].object : null;
-    const nextRegion = regionFromObject(hitObj);
-    if (nextRegion !== hoveredRegion) {
-        setRegionHighlight(hoveredRegion, false);
-        hoveredRegion = nextRegion;
-        setRegionHighlight(hoveredRegion, true);
-    }
-}
-
 renderer.domElement.addEventListener("touchstart", onTouchStart, { passive: true });
-renderer.domElement.addEventListener("touchmove", onTouchMove, { passive: true });
 
 function animate() {
     requestAnimationFrame(animate);
-    const t = performance.now() * 0.001;
-    controls.target.y = baseTargetY + (isUserInteracting ? 0 : Math.sin(t * 0.6) * 0.04);
     controls.update();
     renderer.render(scene, camera);
 }
@@ -272,6 +164,5 @@ animate();
 window.addEventListener("resize", () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
 });

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Careful Carpenter - Off Grid Consulting</title>
+    <link rel="stylesheet" href="css/service-page.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <p class="eyebrow">Careful Carpenter</p>
+            <h1>Off Grid Consulting</h1>
+            <p class="lead">Practical help planning power, water, and heat for homes beyond the utility lines, from someone who has built and lived it.</p>
+        </div>
+
+        <section class="card">
+            <h2>What We Help With</h2>
+            <ul>
+                <li>Solar array sizing, placement, and roof or ground mounting</li>
+                <li>Battery storage and inverter selection</li>
+                <li>Backup generator integration and automatic transfer</li>
+                <li>Well, cistern, and gravity-fed water system layout</li>
+                <li>Wood, propane, and electric heating strategies for cold climates</li>
+                <li>Load budgeting so the system you buy matches how you actually live</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <h2>How It Works</h2>
+            <ul>
+                <li><strong>Site visit or video walkthrough</strong> to understand your land, sun exposure, and goals</li>
+                <li><strong>System plan</strong> with a parts list, rough budget, and phasing options</li>
+                <li><strong>Build support</strong> if you want help installing racking, running conduit, or framing utility spaces</li>
+            </ul>
+        </section>
+
+        <section class="card contact-form">
+            <h2>Start a Conversation</h2>
+            <form id="offGridForm">
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="focus">Main Focus</label>
+                        <select id="focus" name="focus" required>
+                            <option value="">Select a focus</option>
+                            <option value="solar">Solar &amp; Batteries</option>
+                            <option value="water">Water Systems</option>
+                            <option value="heat">Heating</option>
+                            <option value="whole-system">Whole-Home Plan</option>
+                        </select>
+                    </div>
+                    <div class="form-group span-2">
+                        <label for="description">Tell us about your site and goals</label>
+                        <textarea id="description" name="description" required></textarea>
+                    </div>
+                </div>
+                <button type="submit">Request a Consult</button>
+            </form>
+        </section>
+
+        <a href="index.html" class="back-link">← Back to Home</a>
+    </div>
+    <script>
+        document.getElementById('offGridForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thanks for reaching out. We will be in touch to set up your off grid consult.');
+            this.reset();
+        });
+    </script>
+</body>
+</html>
